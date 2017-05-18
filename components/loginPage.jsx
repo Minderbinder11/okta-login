@@ -2,6 +2,9 @@
 
 import React from 'react';
 import axios from 'axios';
+import { Redirect } from 'react-router';
+import HomePage from './homePage.jsx';
+
 
 class LoginPage extends React.Component {
 
@@ -13,7 +16,8 @@ class LoginPage extends React.Component {
 			showMFA: false,
 			showLoginError: false,
 			mfacode: '',
-			mfaError: false
+			mfaError: false,
+			isAuth: false
 		};
 		this.handleUsernameChange = this.handleUsernameChange.bind(this);
 		this.handlePasswordChange	= this.handlePasswordChange.bind(this);
@@ -66,6 +70,7 @@ class LoginPage extends React.Component {
 
 			if (response.data.factorResult === 'SUCCESS') {
 				this.setState({showMFA: false});
+				this.setState({isAuth: true});
 				// now need to redirect them to a landing page
 
 			} else {
@@ -80,6 +85,14 @@ class LoginPage extends React.Component {
 	}
 
 	render(){
+
+		if(this.state.isAuth){
+			return (
+				<Redirect to='/api' />
+				);
+		}
+
+
 		return (<div>
 				<div className="bannerBox"></div>
 				<label>Username</label><input type="text" value={this.state.username} onChange={this.handleUsernameChange}></input>

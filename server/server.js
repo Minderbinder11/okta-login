@@ -31,12 +31,34 @@ app.use(express.static('client'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 
+function requireLogin(req, res, next) {
+  if (req.session.userId) {
+  	console.log(req.session);
+    next(); // allow the next route to run
+  } else {
+    // require the user to log in
+    console.log('cant get MFA');
+    res.redirect('/'); // or render a form, etc.
+  }
+}
+
+// this should secure all routes to make sure the user has
+// a active session.
+
+app.all('/api', requireLogin, (req, res, next) => {
+	next();
+});
+
+
 app.get('/', express.static(path.join(__dirname + '/../client')));
 
 app.post('/login', (req, res) => {
 
 	if(req.session.userId) {
 		console.log('active session');
+		// at this point I should send e message to the app to have it 
+		// divert to the logged in page.
+
 	} else {
 		console.log('NO ACTIVE SESSION');
 	}
@@ -109,6 +131,12 @@ app.post('/mfa', (req, res) => {
 	  res.json(body);
 	});
 
+});
+
+app.get('/api', (req, res) => {
+
+	console.log('in the api');
+	res.send('<p>hello there</p>');
 });
 
 app.listen(port, console.log(`Server running on port ${port}`));
