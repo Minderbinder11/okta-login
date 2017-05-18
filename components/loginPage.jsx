@@ -61,7 +61,10 @@ class LoginPage extends React.Component {
 		axios.post('/mfa', {
 			mfacode: this.state.mfacode })
 		.then( response => {
-			if (response.data.factorResult) {
+
+			console.log('response.data: ', response.data);
+
+			if (response.data.factorResult === 'SUCCESS') {
 				this.setState({showMFA: false});
 				// now need to redirect them to a landing page
 
