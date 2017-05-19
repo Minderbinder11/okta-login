@@ -162,7 +162,7 @@ app.get('/api', (req, res) => {
 app.get('/logout', (req, res) => {
 
 res.send({logout: 'logout'});
-//res.session = null;
+req.session.destroy();
 // the above didnt work. I need to figure out how to end the session on logout
 });
 
