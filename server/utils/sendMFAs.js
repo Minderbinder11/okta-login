@@ -14,16 +14,13 @@ module.exports = (req, res) => {
      { 'cache-control': 'no-cache',
        'authorization': 'SSWS '+ apiKey,
        'content-type': 'application/json',
-       'accept': 'application/json' } };
+       'accept': 'application/json' } 
+  };
 
   // second request to get MFAs    
-
-  console.log('userIS in sendMFA, ', req.session.userId); 
   request(factorOptions, function (error, response, body) {
     
     if (error) {
-      //throw new Error(error);
-      console.log('top error');
       res.json({error: true});
     } else {
       body = JSON.parse(body);
@@ -37,8 +34,8 @@ module.exports = (req, res) => {
         });
 
       } else {
-        console.log('in da money');
-        //body = JSON.parse(body);
+        console.log('3. Received list of factors');
+
         var factorId = body[0].id;
         req.session.factorId = factorId;
 

@@ -26,6 +26,20 @@ class LoginPage extends React.Component {
 		this.handleMFAChange 			= this.handleMFAChange.bind(this);
 	}
 
+	componentDidMount() {
+		console.log('in component did mount')
+		axios.get('/isAuth')
+		.then(response => {
+
+			console.log('resonse from server',response.data.status )
+			
+			if(	response.data.status === 'ACTIVE') {
+				this.setState({isAuth: true});
+			}
+		});
+
+	}
+
 	handleUsernameChange (e) {
 		this.setState({ username: e.target.value });
 	}
@@ -46,8 +60,13 @@ class LoginPage extends React.Component {
 					username: '',
 					password: ''
 				});
+			} else if (response.data.status === 'AUTHENTICATED') {
+
+				 this.setState({isAuth: true})
+
 			} else {
 				this.setState({showMFA: true});		
+			
 			}
 		})
 		.catch(err => {
@@ -71,7 +90,6 @@ class LoginPage extends React.Component {
 			if (response.data.factorResult === 'SUCCESS') {
 				this.setState({showMFA: false});
 				this.setState({isAuth: true});
-				// now need to redirect them to a landing page
 
 			} else {
 				// show an error message

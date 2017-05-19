@@ -31,88 +31,108 @@ app.use(express.static('client'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 
+// middleware to ensure user is logged in by checking the req.session.userId
+
 function requireLogin(req, res, next) {
   if (req.session.userId) {
-  	console.log(req.session);
-    next(); // allow the next route to run
+  	console.log('1. middleware approved')
+    next();
   } else {
-    // require the user to log in
-    console.log('cant get MFA');
-    res.redirect('/'); // or render a form, etc.
+  	console.log('1. middleware not approved');
+    res.redirect('/');
   }
 }
 
 // this should secure all routes to make sure the user has
 // a active session.
 
+function sessionActive(req, res, next) {
+	console.log('in active session');
+	if (req.session.userId) {
+		console.log('session Active', req.session)
+		res.send({status: 'ACTIVE'})
+		next();
+	} else {
+				console.log('session INACTIVE', req.session)
+		res.send({status: 'INACTIVE'})
+		next();
+	}
+}
+
 app.all('/api', requireLogin, (req, res, next) => {
 	next();
 });
 
+app.get('/isAuth', sessionActive, (req, res, next) => {
+	console.log('in get / ');
+	next();
+});
 
-app.get('/', express.static(path.join(__dirname + '/../client')));
+// app.get('/', (req, res) => {
+
+// 	console.log('0.  serving file')
+// 	if (req.session.userId) {
+// 		console.log('0. session already exists', req.session.userId)
+// 	} else {
+// 		console.log('0. no session', req.session.userId);
+// 		//express.static(path.join(__dirname + '/../client'));
+// 		//res.sendFile(path.join(__dirname, '/../client/index.html'));
+// 	}
+// });
 
 app.post('/login', (req, res) => {
 
 	if(req.session.userId) {
-		console.log('active session');
-		// at this point I should send e message to the app to have it 
-		// divert to the logged in page.
+		console.log('2. active session');
+		res.json({status: 'AUTHENTICATED'});
+		//response.data.status === 'AUTHENTICATED'
+		// need to communicate to the client that result is good and can log in
 
 	} else {
-		console.log('NO ACTIVE SESSION');
-	}
+		console.log('2. NO ACTIVE SESSION');
 
-	var options = { 
-    method: 'POST',
-    url: oktaUrl + '/api/v1/authn',
-	  headers: 
-	   { 'cache-control': 'no-cache',
-	     'content-type': 'application/json',
-	     'accept': 'application/json' },
-	  body: 
-	   { username:  'steinbeck@dev-477147.com',//req.body.username,
-	     password: 'Barnegat01',//req.body.password,
-	     options: 
-	      { multiOptionalFactorEnroll: true,
-	        warnBeforePasswordExpired: true } },
-	  json: true };
+		var options = { 
+	    method: 'POST',
+	    url: oktaUrl + '/api/v1/authn',
+		  headers: 
+		   { 'cache-control': 'no-cache',
+		     'content-type': 'application/json',
+		     'accept': 'application/json' },
+		  body: 
+		   { username:  'steinbeck@dev-477147.com',//req.body.username,
+		     password: 'Barnegat01',//req.body.password,
+		     options: 
+		      { multiOptionalFactorEnroll: true,
+		        warnBeforePasswordExpired: true } },
+		  json: true };
 
-	// first request to get sessionToken and userID  
-	request(options, function (error, response, body) {
-		// cookies????			
-	  if(req.cookie)
-			console.log(req.cookie['mfa-id']);
+		// first request to get sessionToken and userID  
+		request(options, function (error, response, body) {
 
-  if (body.status === 'SUCCESS') {
-    userId = body._embedded.user.id;
+		  if (body.status === 'SUCCESS') {
+		    userId = body._embedded.user.id;
 
-	  // if there currently isnt a session set on the server
-	  // set the userID and get the session info
-	  // may have to move this into the MFA part
-  	if (!req.session.userId) { 
-  		req.session.userId = userId;
-  		setSession(req, res, body.sessionToken);
-		} else {
-			req.session.views ++;
-		}
-			//console.log(req.session);
+		  	if (!req.session.userId) { 
+		  		req.session.userId = userId;
+		  		setSession(req, res, body.sessionToken);
+				}
+				
 			sendMFAs(req, res);
-			console.log('factor ID in login', req.session.factorId);
-	  } else {
-	  	res.json({error: true});
-	  }
-	});
-
+			
+			} else {
+			  // failure of the request
+			  res.json({error: true});
+			}
+		});
+	}
 });
 
 
+// client sends MFA back to server for validation
 app.post('/mfa', (req, res) => {
 
 	var code = req.body.mfacode;
-	console.log('code: ', code);
-	console.log('userId: ', userId);
-	console.log('factorId: ', req.session.factorId);
+	console.log('4. MFA Validation: ', code);
 
 
 	var options = { 
@@ -137,6 +157,13 @@ app.get('/api', (req, res) => {
 
 	console.log('in the api');
 	res.send('<p>hello there</p>');
+});
+
+app.get('/logout', (req, res) => {
+
+res.send({logout: 'logout'});
+//res.session = null;
+// the above didnt work. I need to figure out how to end the session on logout
 });
 
 app.listen(port, console.log(`Server running on port ${port}`));
