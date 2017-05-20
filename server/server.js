@@ -68,27 +68,14 @@ app.get('/isAuth', sessionActive, (req, res, next) => {
 	next();
 });
 
-// app.get('/', (req, res) => {
-
-// 	console.log('0.  serving file')
-// 	if (req.session.userId) {
-// 		console.log('0. session already exists', req.session.userId)
-// 	} else {
-// 		console.log('0. no session', req.session.userId);
-// 		//express.static(path.join(__dirname + '/../client'));
-// 		//res.sendFile(path.join(__dirname, '/../client/index.html'));
-// 	}
-// });
-
 app.post('/login', (req, res) => {
 
 	if(req.session.userId) {
 		console.log('2. active session');
 		res.json({status: 'AUTHENTICATED'});
-		//response.data.status === 'AUTHENTICATED'
-		// need to communicate to the client that result is good and can log in
 
 	} else {
+
 		console.log('2. NO ACTIVE SESSION');
 
 		var options = { 
@@ -99,26 +86,63 @@ app.post('/login', (req, res) => {
 		     'content-type': 'application/json',
 		     'accept': 'application/json' },
 		  body: 
-		   { username:  'steinbeck@dev-477147.com',//req.body.username,
-		     password: 'Barnegat01',//req.body.password,
+		   { username:  req.body.username,
+		     password: req.body.password,
 		     options: 
 		      { multiOptionalFactorEnroll: true,
 		        warnBeforePasswordExpired: true } },
-		  json: true };
+		  json: true 
+			};
 
 		// first request to get sessionToken and userID  
 		request(options, function (error, response, body) {
+			console.log('got active session', body);
 
 		  if (body.status === 'SUCCESS') {
 		    userId = body._embedded.user.id;
 
-		  	if (!req.session.userId) { 
+		  	//if (!req.session.userId) { 
 		  		req.session.userId = userId;
+		  		// use th sessionToken to set the session 
 		  		setSession(req, res, body.sessionToken);
-				}
-				
+				//}
+				// set the MFA factor ID on the session
+				// send message to the login page to show the MFA box
+
 			sendMFAs(req, res);
 			
+			} else if (body.status === 'MFA_ENROLL'){
+				// perform the enroll in MFA steps here
+				req.session.userId = body._embedded.user.id
+				// need to get the factor ID before I can activate it.
+				var options = { 
+					method: 'POST',
+				  url: oktaUrl + '/api/v1/users/'+ body._embedded.user.id +'/factors',
+				  headers: 
+				   { //'postman-token': '60326b07-45f7-bc5d-4b17-0dd105ac23f9',
+				     'cache-control': 'no-cache',
+				     'authorization': 'SSWS '+ apiKey,
+				     'content-type': 'application/json',
+				     'accept': 'application/json' },
+				  body: { factorType: 'token:software:totp', provider: 'GOOGLE' },
+				  json: true };
+
+				request(options, function (error, response, body) {
+				  if (error) throw new Error(error);
+
+				  req.session.factorId = body.id;
+				  
+				  console.log('from factor enroll', body.id);
+
+				  res.json({
+				  	href: body._embedded.activation._links.qrcode.href,
+				  	status: 'ENROLL'
+				  });
+				});
+
+
+
+
 			} else {
 			  // failure of the request
 			  res.json({error: true});
@@ -127,6 +151,28 @@ app.post('/login', (req, res) => {
 	}
 });
 
+app.post('/mfaactivate', (req, res) => {
+
+	// send post to activate here
+	var options = { 
+		method: 'POST',
+  	url: 'https://dev-477147.oktapreview.com/api/v1/users/'+ req.session.userId +'/factors/'+ req.session.factorId +'/lifecycle/activate',
+  	headers: { //'postman-token': '4c541050-5981-a846-7165-cb8f7533c8d0',
+     	'cache-control': 'no-cache',
+     	'authorization': 'SSWS 00p_Z5emQrIXfw228qBmju0GtmVdDb3V_Vp0gwkpNb',
+     	'content-type': 'application/json',
+     	'accept': 'application/json' },
+  body: { passCode: req.body.mfacode },
+  json: true };
+
+	request(options, function (error, response, body) {
+	  if (error) throw new Error(error);
+
+	  console.log('response from Activate', body);
+	  res.json({status: 'SUCCESS'});
+	});
+
+});
 
 // client sends MFA back to server for validation
 app.post('/mfa', (req, res) => {
@@ -137,7 +183,7 @@ app.post('/mfa', (req, res) => {
 
 	var options = { 
 		method: 'POST',
-  	url: oktaUrl+ '/api/v1/users/'+ userId +'/factors/'+ req.session.factorId +'/verify',
+  	url: oktaUrl+ '/api/v1/users/'+ req.session.userId +'/factors/'+ req.session.factorId +'/verify',
   	headers: { 
      	'cache-control': 'no-cache',
 			'authorization': 'SSWS '+ apiKey,

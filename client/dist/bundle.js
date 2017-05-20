@@ -11788,13 +11788,18 @@ var LoginPage = function (_React$Component) {
 			showLoginError: false,
 			mfacode: '',
 			mfaError: false,
-			isAuth: false
+			isAuth: false,
+			mfaEnroll: false,
+			mfaEnrollLink: '',
+			mfaActivate: false
 		};
 		_this.handleUsernameChange = _this.handleUsernameChange.bind(_this);
 		_this.handlePasswordChange = _this.handlePasswordChange.bind(_this);
 		_this.handleSubmit = _this.handleSubmit.bind(_this);
 		_this.handleMFASubmit = _this.handleMFASubmit.bind(_this);
 		_this.handleMFAChange = _this.handleMFAChange.bind(_this);
+		_this.hanldeActivateMFA = _this.hanldeActivateMFA.bind(_this);
+		_this.handleMFAActivateCode = _this.handleMFAActivateCode.bind(_this);
 		return _this;
 	}
 
@@ -11803,14 +11808,46 @@ var LoginPage = function (_React$Component) {
 		value: function componentDidMount() {
 			var _this2 = this;
 
-			console.log('in component did mount');
 			_axios2.default.get('/isAuth').then(function (response) {
-
-				console.log('resonse from server', response.data.status);
-
 				if (response.data.status === 'ACTIVE') {
 					_this2.setState({ isAuth: true });
 				}
+			});
+		}
+	}, {
+		key: 'handleMFAActivateCode',
+		value: function handleMFAActivateCode() {
+			var _this3 = this;
+
+			var code = this.state.mfacode;
+			this.setState({
+				mfacode: '',
+				mfaActivate: false
+			});
+
+			_axios2.default.post('/mfaactivate', { mfacode: code }).then(function (response) {
+				console.log('mfa activate response');
+				if (response.data.status === 'SUCCESS') {
+					_this3.setState({
+						showMFA: true,
+						mfaActivate: false,
+						mfacode: ''
+					});
+				} else {
+					_this3.setState({
+						mfaactivate: false,
+						showLoginError: true
+					});
+				}
+			});
+		}
+	}, {
+		key: 'hanldeActivateMFA',
+		value: function hanldeActivateMFA() {
+			this.setState({
+				mfaEnroll: false,
+				mfaEnrollLink: '',
+				mfaActivate: true
 			});
 		}
 	}, {
@@ -11826,23 +11863,29 @@ var LoginPage = function (_React$Component) {
 	}, {
 		key: 'handleSubmit',
 		value: function handleSubmit() {
-			var _this3 = this;
+			var _this4 = this;
 
 			_axios2.default.post('/login', {
 				username: this.state.username,
 				password: this.state.password }).then(function (response) {
 				console.log('response', response);
 				if (response.data.error) {
-					_this3.setState({
+					_this4.setState({
 						showLoginError: true,
 						username: '',
 						password: ''
 					});
 				} else if (response.data.status === 'AUTHENTICATED') {
 
-					_this3.setState({ isAuth: true });
+					_this4.setState({ isAuth: true });
+				} else if (response.data.status === 'ENROLL') {
+					// here I need to show link to MFA Enrollment
+					_this4.setState({
+						mfaEnroll: true,
+						mfaEnrollLink: response.data.href
+					});
 				} else {
-					_this3.setState({ showMFA: true });
+					_this4.setState({ showMFA: true });
 				}
 			}).catch(function (err) {
 				console.log('error');
@@ -11856,7 +11899,7 @@ var LoginPage = function (_React$Component) {
 	}, {
 		key: 'handleMFASubmit',
 		value: function handleMFASubmit() {
-			var _this4 = this;
+			var _this5 = this;
 
 			this.setState({ mfaError: false });
 			_axios2.default.post('/mfa', {
@@ -11865,11 +11908,11 @@ var LoginPage = function (_React$Component) {
 				console.log('response.data: ', response.data);
 
 				if (response.data.factorResult === 'SUCCESS') {
-					_this4.setState({ showMFA: false });
-					_this4.setState({ isAuth: true });
+					_this5.setState({ showMFA: false });
+					_this5.setState({ isAuth: true });
 				} else {
 					// show an error message
-					_this4.setState({ mfaError: true });
+					_this5.setState({ mfaError: true });
 				}
 			}).catch(function (err) {
 				console.log(err);
@@ -11911,6 +11954,31 @@ var LoginPage = function (_React$Component) {
 						'h2',
 						null,
 						'Incorrect MFA Code'
+					)
+				),
+				this.state.mfaEnroll && _react2.default.createElement(
+					'div',
+					null,
+					'Follow link to Active Google Authenticate MFA',
+					_react2.default.createElement(
+						'a',
+						{ href: this.state.mfaEnrollLink, target: 'blank', onClick: this.hanldeActivateMFA },
+						'Activate'
+					)
+				),
+				this.state.mfaActivate && _react2.default.createElement(
+					'div',
+					null,
+					_react2.default.createElement(
+						'h2',
+						null,
+						'Enter MFA Activation Code here'
+					),
+					_react2.default.createElement('input', { type: 'text', value: this.state.mfacode, onChange: this.handleMFAChange }),
+					_react2.default.createElement(
+						'button',
+						{ onClick: this.handleMFAActivateCode },
+						'Send MFA'
 					)
 				),
 				this.state.showMFA && _react2.default.createElement(

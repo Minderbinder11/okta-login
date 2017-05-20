@@ -17,9 +17,9 @@ module.exports = (req, res) => {
        'accept': 'application/json' } 
   };
 
-  // second request to get MFAs    
+  // second request to get list of MFAs    
   request(factorOptions, function (error, response, body) {
-    
+    console.log('sending to Okta for MFAs');
     if (error) {
       res.json({error: true});
     } else {

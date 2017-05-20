@@ -5,7 +5,7 @@ const oktaUrl = 'https://dev-477147.oktapreview.com';
 
 module.exports = (req, res, sessionToken ) => {
 
-  req.session.views = 1;
+  ///req.session.views = 1;
 
   var options = {
     url: oktaUrl + '/api/v1/sessions',
