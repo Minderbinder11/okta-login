@@ -50,7 +50,7 @@ app.all('/api', requireLogin, (req, res, next) => {
 });
 
 
-app.get('/', express.static(path.join(__dirname + '/../client')));
+//app.get('/', express.static(path.join(__dirname + '/../client')));
 
 app.post('/login', (req, res) => {
 
