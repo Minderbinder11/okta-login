@@ -5,7 +5,7 @@ const oktaUrl = 'https://dev-477147.oktapreview.com';
 
 module.exports = (req, res, sessionToken ) => {
 
-  req.session.views = 1;
+  ///req.session.views = 1;
 
   var options = {
     url: oktaUrl + '/api/v1/sessions',
@@ -22,8 +22,8 @@ module.exports = (req, res, sessionToken ) => {
     console.log('in sessions callback');
     if (!error) {
         body = JSON.parse(body);
+        // need to investiate if this is needed,  or if express sessions does this on its own.
         req.session.body = body;
-        console.log(body);
     } else {
       console.log('error: ', error);
     }

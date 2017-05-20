@@ -31,93 +31,160 @@ app.use(express.static('client'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 
+// middleware to ensure user is logged in by checking the req.session.userId
+
 function requireLogin(req, res, next) {
   if (req.session.userId) {
-  	console.log(req.session);
-    next(); // allow the next route to run
+  	console.log('1. middleware approved')
+    next();
   } else {
-    // require the user to log in
-    console.log('cant get MFA');
-    res.redirect('/'); // or render a form, etc.
+  	console.log('1. middleware not approved');
+    res.redirect('/');
   }
 }
 
 // this should secure all routes to make sure the user has
 // a active session.
 
+function sessionActive(req, res, next) {
+	console.log('in active session');
+	if (req.session.userId) {
+		console.log('session Active', req.session)
+		res.send({status: 'ACTIVE'})
+		next();
+	} else {
+				console.log('session INACTIVE', req.session)
+		res.send({status: 'INACTIVE'})
+		next();
+	}
+}
+
 app.all('/api', requireLogin, (req, res, next) => {
 	next();
 });
 
 
-//app.get('/', express.static(path.join(__dirname + '/../client')));
+app.get('/isAuth', sessionActive, (req, res, next) => {
+	console.log('in get / ');
+	next();
+});
 
 app.post('/login', (req, res) => {
 
 	if(req.session.userId) {
-		console.log('active session');
-		// at this point I should send e message to the app to have it 
-		// divert to the logged in page.
+		console.log('2. active session');
+		res.json({status: 'AUTHENTICATED'});
 
 	} else {
-		console.log('NO ACTIVE SESSION');
-	}
 
-	var options = { 
-    method: 'POST',
-    url: oktaUrl + '/api/v1/authn',
-	  headers: 
-	   { 'cache-control': 'no-cache',
-	     'content-type': 'application/json',
-	     'accept': 'application/json' },
-	  body: 
-	   { username:  'steinbeck@dev-477147.com',//req.body.username,
-	     password: 'Barnegat01',//req.body.password,
-	     options: 
-	      { multiOptionalFactorEnroll: true,
-	        warnBeforePasswordExpired: true } },
-	  json: true };
+		console.log('2. NO ACTIVE SESSION');
 
-	// first request to get sessionToken and userID  
-	request(options, function (error, response, body) {
-		// cookies????			
-	  if(req.cookie)
-			console.log(req.cookie['mfa-id']);
+		var options = { 
+	    method: 'POST',
+	    url: oktaUrl + '/api/v1/authn',
+		  headers: 
+		   { 'cache-control': 'no-cache',
+		     'content-type': 'application/json',
+		     'accept': 'application/json' },
+		  body: 
+		   { username:  req.body.username,
+		     password: req.body.password,
+		     options: 
+		      { multiOptionalFactorEnroll: true,
+		        warnBeforePasswordExpired: true } },
+		  json: true 
+			};
 
-  if (body.status === 'SUCCESS') {
-    userId = body._embedded.user.id;
+		// first request to get sessionToken and userID  
+		request(options, function (error, response, body) {
+			console.log('got active session', body);
 
-	  // if there currently isnt a session set on the server
-	  // set the userID and get the session info
-	  // may have to move this into the MFA part
-  	if (!req.session.userId) { 
-  		req.session.userId = userId;
-  		setSession(req, res, body.sessionToken);
-		} else {
-			req.session.views ++;
-		}
-			//console.log(req.session);
+		  if (body.status === 'SUCCESS') {
+		    userId = body._embedded.user.id;
+
+		  	//if (!req.session.userId) { 
+		  		req.session.userId = userId;
+		  		// use th sessionToken to set the session 
+		  		setSession(req, res, body.sessionToken);
+				//}
+				// set the MFA factor ID on the session
+				// send message to the login page to show the MFA box
+
 			sendMFAs(req, res);
-			console.log('factor ID in login', req.session.factorId);
-	  } else {
-	  	res.json({error: true});
-	  }
+			
+			} else if (body.status === 'MFA_ENROLL'){
+				// perform the enroll in MFA steps here
+				req.session.userId = body._embedded.user.id
+				// need to get the factor ID before I can activate it.
+				var options = { 
+					method: 'POST',
+				  url: oktaUrl + '/api/v1/users/'+ body._embedded.user.id +'/factors',
+				  headers: 
+				   { //'postman-token': '60326b07-45f7-bc5d-4b17-0dd105ac23f9',
+				     'cache-control': 'no-cache',
+				     'authorization': 'SSWS '+ apiKey,
+				     'content-type': 'application/json',
+				     'accept': 'application/json' },
+				  body: { factorType: 'token:software:totp', provider: 'GOOGLE' },
+				  json: true };
+
+				request(options, function (error, response, body) {
+				  if (error) throw new Error(error);
+
+				  req.session.factorId = body.id;
+				  
+				  console.log('from factor enroll', body.id);
+
+				  res.json({
+				  	href: body._embedded.activation._links.qrcode.href,
+				  	status: 'ENROLL'
+				  });
+				});
+
+
+
+
+			} else {
+			  // failure of the request
+			  res.json({error: true});
+			}
+		});
+	}
+});
+
+app.post('/mfaactivate', (req, res) => {
+
+	// send post to activate here
+	var options = { 
+		method: 'POST',
+  	url: 'https://dev-477147.oktapreview.com/api/v1/users/'+ req.session.userId +'/factors/'+ req.session.factorId +'/lifecycle/activate',
+  	headers: { //'postman-token': '4c541050-5981-a846-7165-cb8f7533c8d0',
+     	'cache-control': 'no-cache',
+     	'authorization': 'SSWS 00p_Z5emQrIXfw228qBmju0GtmVdDb3V_Vp0gwkpNb',
+     	'content-type': 'application/json',
+     	'accept': 'application/json' },
+  body: { passCode: req.body.mfacode },
+  json: true };
+
+	request(options, function (error, response, body) {
+	  if (error) throw new Error(error);
+
+	  console.log('response from Activate', body);
+	  res.json({status: 'SUCCESS'});
 	});
 
 });
 
-
+// client sends MFA back to server for validation
 app.post('/mfa', (req, res) => {
 
 	var code = req.body.mfacode;
-	console.log('code: ', code);
-	console.log('userId: ', userId);
-	console.log('factorId: ', req.session.factorId);
+	console.log('4. MFA Validation: ', code);
 
 
 	var options = { 
 		method: 'POST',
-  	url: oktaUrl+ '/api/v1/users/'+ userId +'/factors/'+ req.session.factorId +'/verify',
+  	url: oktaUrl+ '/api/v1/users/'+ req.session.userId +'/factors/'+ req.session.factorId +'/verify',
   	headers: { 
      	'cache-control': 'no-cache',
 			'authorization': 'SSWS '+ apiKey,
@@ -137,6 +204,13 @@ app.get('/api', (req, res) => {
 
 	console.log('in the api');
 	res.send('<p>hello there</p>');
+});
+
+app.get('/logout', (req, res) => {
+
+res.send({logout: 'logout'});
+req.session.destroy();
+// the above didnt work. I need to figure out how to end the session on logout
 });
 
 app.listen(port, console.log(`Server running on port ${port}`));
