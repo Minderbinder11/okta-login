@@ -80,8 +80,8 @@ app.post('/login', (req, res) => {
 		console.log('2. NO ACTIVE SESSION');
 
 		var options = { 
-	    method: 'POST',
-	    url: oktaUrl + '/api/v1/authn',
+			method: 'POST',
+			url: oktaUrl + '/api/v1/authn',
 		  headers: 
 		   { 'cache-control': 'no-cache',
 		     'content-type': 'application/json',
@@ -114,7 +114,8 @@ app.post('/login', (req, res) => {
 			
 			} else if (body.status === 'MFA_ENROLL'){
 				// perform the enroll in MFA steps here
-				req.session.userId = body._embedded.user.id
+				// i need to set the session somewhere in here
+				req.session.userId = body._embedded.user.id;
 				// need to get the factor ID before I can activate it.
 				var options = { 
 					method: 'POST',
@@ -140,9 +141,6 @@ app.post('/login', (req, res) => {
 				  	status: 'ENROLL'
 				  });
 				});
-
-
-
 
 			} else {
 			  // failure of the request
@@ -184,7 +182,7 @@ app.post('/mfa', (req, res) => {
 
 	var options = { 
 		method: 'POST',
-  	url: oktaUrl+ '/api/v1/users/'+ req.session.userId +'/factors/'+ req.session.factorId +'/verify',
+  	url: oktaUrl + '/api/v1/users/' + req.session.userId + '/factors/' + req.session.factorId + '/verify',
   	headers: { 
      	'cache-control': 'no-cache',
 			'authorization': 'SSWS '+ apiKey,
@@ -200,9 +198,49 @@ app.post('/mfa', (req, res) => {
 
 });
 
-app.get('/api', (req, res) => {
+app.post('/adduser', (req, res) => {
+	
+	var username = req.body.username;
+	var password = req.body.password;
+	var firstName = req.body.firstname;
+	var lastName = req.body.lastname;
 
-	console.log('in the api');
+	var options = { 
+		method: 'POST',
+   	url: oktaUrl + '/api/v1/users',
+    qs: { activate: 'false' },
+    headers: 
+     { //'postman-token': '92592bf6-2eca-f170-0ba0-ac27dbdd6c41',
+      'cache-control': 'no-cache',
+	    'authorization': 'SSWS '+ apiKey,
+      'content-type': 'application/json',
+      'accept': 'application/json' },
+    body: 
+     { profile: 
+        { firstName: firstName,
+          lastName: lastName,
+          email: username, // check in client that username is an email
+          login: username 
+        },
+       credentials: { password: { value: password } } },
+    json: true 
+	};
+
+	request(options, function (error, response, body) {
+	 
+	  if (error) {
+	  	throw new Error(error);
+	  	res.json({status: error});
+	  }
+
+	  console.log(body);
+	  res.json({status: 'SUCCESS'});
+	});
+
+
+});
+
+app.get('/api', (req, res) => {
 	res.send('<p>hello there</p>');
 });
 

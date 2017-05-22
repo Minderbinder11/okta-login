@@ -8,17 +8,30 @@ class HomePage extends React.Component {
   constructor(props) {
     super(props);
     this.handleLogOut = this.handleLogOut.bind(this);
-    this.state = {loggedIn: true}
+    this.state = {loggedIn: true};
   } 
 
   handleLogOut () {
     axios.get('/logout')
     .then(response => {
-
-      console.log('Logged out')
       this.setState({loggedIn: false});
+    });
+  }
 
+  handleAddUser () {
+    axios.post('/adduser', 
+      { username: 'john.adams@example.com',
+        password: 'BH22escow',
+        firstname: 'John',
+        lastname: 'Adams'
     })
+    .then(response => {
+      if(response.data.status === 'ERROR') {
+        console.log('error');
+      } else if (response.data.status === 'SUCCESS') {
+        console.log('added users');
+      }
+    });
 
   }
 
@@ -27,8 +40,11 @@ class HomePage extends React.Component {
       if (this.state.loggedIn) {
         return ( 
           <div>
-            <h2>Welcome Home</h2>
+            <h2>Welcome To The HomePage</h2>
             <button onClick={this.handleLogOut}>Log Out</button>
+            <div className="addUser" onClick={this.handleAddUser}>
+              Add User
+            </div>
           </div>
         );
         } 
