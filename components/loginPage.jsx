@@ -5,6 +5,8 @@ import axios from 'axios';
 import { Redirect } from 'react-router';
 import HomePage from './homePage.jsx';
 
+// PROBLEM OF SIGNING IN AND THE HITTING REFRESH AND HAVING IT GO TO THE LOGIN PAGE
+
 
 class LoginPage extends React.Component {
 
@@ -29,6 +31,7 @@ class LoginPage extends React.Component {
 		this.handleMFAChange 				= this.handleMFAChange.bind(this);
 		this.hanldeActivateMFA			= this.hanldeActivateMFA.bind(this);
 		this.handleMFAActivateCode	= this.handleMFAActivateCode.bind(this);
+		this.resetPassword 					= this.resetPassword.bind(this);
 	}
 
 	componentDidMount() {
@@ -84,11 +87,12 @@ class LoginPage extends React.Component {
 	}
 
 	handleSubmit () {
+
 		axios.post('/login', {
 				username: this.state.username,
 				password: this.state.password })
 		.then(response => {
-			console.log('response', response)
+			console.log('response', response);
 			if (response.data.error) {
 				console.log('login error');
 				this.setState({
@@ -149,6 +153,28 @@ class LoginPage extends React.Component {
 		})
 	}
 
+	resetPassword () {
+		console.log('Ive been clicked');
+
+		axios.get('/passwordreset')
+		.then(response => {
+			console.log(response);
+			if (response.data.status === 'SUCCESS') {
+				// redirect to new page like the qr code
+
+			} else if (response.data.status === 'NO_USERID') {
+				// set state to prompt for user is
+
+			} else if (response.data.error) {
+				// set state to show error message
+			}
+
+		})
+		.catch(error => {
+			console.log(error)
+		});
+	}
+
 	render(){
 
 		if(this.state.isAuth){
@@ -194,7 +220,7 @@ class LoginPage extends React.Component {
             </div>
             <button className="btn btn-lg btn-primary btn-block btn-signin" type="submit" onClick={this.handleSubmit}>Sign in</button>
         	</div>
-            <a href="#" className="forgot-password">
+            <a href="#" className="forgot-password" onClick={this.resetPassword}>
                 Forgot the password?
             </a>
 
@@ -231,6 +257,7 @@ class LoginPage extends React.Component {
 					</div>}
 	        </div>
 	    	</div>					
+
 			</div>
 			);
 	}
