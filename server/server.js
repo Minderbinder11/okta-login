@@ -91,6 +91,60 @@ app.get('/applinks', (req, res) => {
 	
 });
 
+app.get('/passwordreset', (req, res) => {
+
+  // FIRST I NEED TO GET THE USERID
+
+  var userOptions = { 
+    method: 'GET',
+    url: oktaUrl + '/api/v1/users',
+    qs: { q: 'ceasar.chavez@example.com' },
+    headers: 
+     { 'cache-control': 'no-cache',
+       authorization: 'SSWS 00p_Z5emQrIXfw228qBmju0GtmVdDb3V_Vp0gwkpNb',
+       'content-type': 'application/json',
+       accept: 'application/json' } };
+
+  request(userOptions, function (error, response, body) {
+    if (error) throw new Error(error);
+
+    console.log(body);
+  });
+
+
+  if (req.session.userId) {
+    // call to reser password
+    var options = { 
+      method: 'POST',
+      url: oktaUrl + '/api/v1/users/'+ req.session.userId +'/lifecycle/reset_password',
+      qs: { sendEmail: 'false' },
+      headers: 
+       { 'postman-token': '9ed9424d-6297-0747-d405-a019730a3df2',
+         'cache-control': 'no-cache',
+         authorization: 'SSWS 00p_Z5emQrIXfw228qBmju0GtmVdDb3V_Vp0gwkpNb',
+         accept: 'application/json',
+         'content-type': 'application/json' } };
+
+    request(options, function (error, response, body) {
+      if (error) {
+        throw new Error(error);
+        res.json({error: error});
+      } else {
+      
+        console.log('reset password body', body);
+        res.json({
+          status: 'SUCCESS',
+          link: body
+        });
+      }
+    });
+
+  } else {
+    res.json({status: 'NO_USERID'});
+  }
+
+});
+
 app.post('/adduser', (req, res) => {
 	
 	var username = req.body.username;
