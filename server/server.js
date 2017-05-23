@@ -39,24 +39,24 @@ app.use(bodyParser.urlencoded({extended: false}));
 // middleware to ensure user is logged in by checking the req.session.userId
 
 function requireLogin(req, res, next) {
+	console.log('in requireloign middleware');
   if (req.session.userId) {
-    next();
+  	console.log('require Login approved next');
+    return next();
   } else {
     res.redirect('/');
   }
 }
 
-app.all('/api', requireLogin, (req, res, next) => {
-
-	next();
-
-});
+app.all('/api/*', requireLogin);
 
 
-app.get('/isAuth', middlewareActiveSession, (req, res, next) => {
-
-	next();
-
+app.get('/isAuth', ( req, res ) => {
+	if (req.session.userId) {
+		res.send({status: 'ACTIVE'})
+	} else {
+		res.send({status: 'INACTIVE'})
+	}
 });
 
 app.post('/login', (req, res) => {
@@ -85,10 +85,74 @@ app.post('/mfa', (req, res) => {
 });
 
 // get list of apps client is provisioned for
-app.get('/applinks', (req, res) => {
+app.get('/api/applinks', (req, res) => {
 
 	getApps(req, res);
 	
+});
+
+
+app.get('/api/groups', (req, res) => {
+
+	req.session.isAdmin = false;
+
+	var options = { 
+		method: 'GET',
+	  url: oktaUrl + '/api/v1/users/' + req.session.userId + '/groups',
+	  headers: 
+	   { 'cache-control': 'no-cache',
+		   'authorization': 'SSWS '+ apiKey,
+	     'content-type': 'application/json',
+	     'accept': 'application/json' } 
+	   };
+
+	request(options, function (error, response, body) {
+
+	  if (error) throw new Error(error);
+	 	
+	 	body = JSON.parse(body);
+	  console.log(body);
+
+	  body.map(group => {
+	  	
+	  	if (group.profile.name === 'admin'){
+	  		req.session.isAdmin = true;
+	  		res.json({status: 'admin'});
+	  	}
+	  });
+
+	  if (!req.session.isAdmin) {
+	  	req.session.isAdmin = false;
+	  	res.json({status: 'user'});
+	  }
+
+	});
+
+});
+
+app.get('/api/getUsers', (req, res) => {
+
+	var options = { 
+		method: 'GET',
+  	url: oktaUrl + '/api/v1/users',
+	  headers: 
+	   { 'postman-token': 'e6336fda-22ad-e78c-14ad-f30b08c1c058',
+	     'cache-control': 'no-cache',
+		   'authorization': 'SSWS '+ apiKey,
+	     'content-type': 'application/json',
+	     'accept': 'application/json' } };
+
+	request(options, function (error, response, body) {
+	  if (error) {
+	  	throw new Error(error);
+	  	res.json({error: error});
+	  } else {
+	  	body = JSON.parse(body);
+	  	res.json({users: body});
+	  	console.log('get Users', body);
+	  }
+	});
+
 });
 
 app.post('/adduser', (req, res) => {
@@ -119,7 +183,6 @@ app.post('/adduser', (req, res) => {
 	};
 
 	request(options, function (error, response, body) {
-	 
 	  if (error) {
 	  	throw new Error(error);
 	  	res.json({status: error});
@@ -129,18 +192,13 @@ app.post('/adduser', (req, res) => {
 
 });
 
-app.get('/api', (req, res) => {
-
-	res.send('<p>hello there</p>');
-
+app.get('/logout', (req, res) => {
+	req.session.destroy();
+	res.send({logout: 'logout'});
 });
 
-app.get('/logout', (req, res) => {
-
-	res.send({logout: 'logout'});
-
-	req.session.destroy();
-
+app.get('/*', (req, res) => {
+    res.redirect('/');
 });
 
 app.listen(port, console.log(`Server running on port ${port}`));

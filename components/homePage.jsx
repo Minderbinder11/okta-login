@@ -3,6 +3,8 @@ import React from 'react';
 import axios from 'axios';
 import { Redirect } from 'react-router';
 import AppLink from './appLink.jsx';
+import { Link } from 'react-router-dom';
+
 
 class HomePage extends React.Component {
 
@@ -11,17 +13,25 @@ class HomePage extends React.Component {
     this.handleLogOut = this.handleLogOut.bind(this);
     this.state = {
       loggedIn: true,
+      admin: false,
       apps: []
     };
   } 
 
   componentDidMount() {
-
-    axios.get('/applinks')
+    axios.get('/api/applinks')
     .then(response => {
       this.setState({apps: response.data})
     });
 
+    axios.get('/api/groups')
+    .then(response => {
+      console.log(response);
+      if (response.data.status === 'admin') {
+        this.setState({isAdmin: true});
+        console.log('is admin', this.state.isAdmin);
+      }
+    });
   }
 
   handleLogOut () {
@@ -66,12 +76,18 @@ class HomePage extends React.Component {
                 return (<AppLink app={app} key={app.id}/>);
             })}
               </ul>
+            { this.state.isAdmin && 
+              <div>
+              Does this show up???
+              <Link to="/admin">Admin</Link>
+              </div>
+            }
           </div>
         );
         } 
 
         return (
-          <Redirect to='/' />
+          <Link />
           );
 
   } 
