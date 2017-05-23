@@ -90,17 +90,19 @@ class LoginPage extends React.Component {
 		.then(response => {
 			console.log('response', response)
 			if (response.data.error) {
+				console.log('login error');
 				this.setState({
 					showLoginError: true,
 					username: '',
 					password: ''
 				});
 			} else if (response.data.status === 'AUTHENTICATED') {
-
+					console.log('Authenticated');
 				 this.setState({isAuth: true})
 
 			} else if (response.data.status === 'ENROLL'){
 				// here I need to show link to MFA Enrollment
+				console.log('enroll');
 				this.setState({
 					mfaEnroll: true,
 					mfaEnrollLink: response.data.href
@@ -135,7 +137,10 @@ class LoginPage extends React.Component {
 
 			} else {
 				// show an error message
-				this.setState({mfaError: true});
+				this.setState({
+					mfaError: true,
+					mfacode: ''
+					});
 			}
 		
 		})
@@ -153,32 +158,104 @@ class LoginPage extends React.Component {
 		}
 
 
-		return (<div>
-				<div className="bannerBox"></div>
-				<label>Username</label><input type="text" value={this.state.username} onChange={this.handleUsernameChange}></input>
-				<label>Password</label><input type="text" value={this.state.password} onChange={this.handlePasswordChange}></input>
-				<button onClick={this.handleSubmit}>Submit</button>
+		return (
+			<div>
 
-				{this.state.mfaError && <div> 
-						<h2>Incorrect MFA Code</h2>
-					</div>}
+				{this.state.mfaError && <div className="alert alert-danger login-message" role="alert"> 
+					Incorrect Google Authenticator Code
+				</div>}
 
-				{this.state.mfaEnroll && <div>
+    <div className="container">
+        <div className="card card-container">
+            <img id="profile-img" className="profile-img-card" src="//ssl.gstatic.com/accounts/ui/avatar_2x.png" />
+            <p id="profile-name" className="profile-name-card"></p>
+            <div className="form-signin">
+                <span id="reauth-email" className="reauth-email"></span>
+                <input 	type="email" 
+                				id="inputEmail" 
+                				className="form-control" 
+                				placeholder="Email address" 
+                				value={this.state.username} 
+                				onChange={this.handleUsernameChange} 
+                				required 
+                				autoFocus></input>
+
+                <input 	type="password" 
+                				id="inputPassword" 
+                				className="form-control" 
+                				placeholder="Password" 
+                				value={this.state.password} 
+                				onChange={this.handlePasswordChange} 
+                				required></input>
+                <div id="remember" className="checkbox">
+                    <label>
+                        <input type="checkbox" value="remember-me"></input>
+                    </label>
+                </div>
+                <button className="btn btn-lg btn-primary btn-block btn-signin" type="submit" onClick={this.handleSubmit}>Sign in</button>
+            </div>
+            <a href="#" className="forgot-password">
+                Forgot the password?
+            </a>
+
+
+          {this.state.mfaEnroll && <div>
 					Follow link to Active Google Authenticate MFA
 					<a href={this.state.mfaEnrollLink} target="blank" onClick={this.hanldeActivateMFA}>Activate</a>
 					</div>}
 
-				{this.state.mfaActivate && <div>
-						<h2>Enter MFA Activation Code here</h2>
-						<input type="text" value={this.state.mfacode} onChange={this.handleMFAChange}></input>
-						<button onClick={this.handleMFAActivateCode}>Send MFA</button>
+				{this.state.mfaActivate && <div className="alert alert-info login-message">
+						<input 	type="text" 
+										className="form-control"
+										placeholder="Google Authenticator Code"
+										value={this.state.mfacode} 
+										onChange={this.handleMFAChange}
+										required></input>
+										<div className="spacer"></div>
+						<button 
+										className="btn btn-lg btn-primary btn-block btn-signin"
+										onClick={this.handleMFAActivateCode}>Send MFA</button>
 				</div>}
 
-				{this.state.showMFA && <div> 
-						<h2>GET MFA CODE HERE</h2>
+				{this.state.showMFA && <div>
+						<input 	type="text" 
+										className="form-control"
+										placeholder="Google Authenticator Code"
+										value={this.state.mfacode} 
+										onChange={this.handleMFAChange}
+										required></input>
+						<div className="spacer"></div>
+						<button 
+										className="btn btn-lg btn-primary btn-block btn-signin"
+										onClick={this.handleMFASubmit}>Send MFA</button>
+				</div>}
+
+        </div>
+    </div>
+
+
+
+{/*
+
+<div className="alert alert-info login-message"> 
+						Enter Google Authenticator Code <br/>
 						<input type="text" value={this.state.mfacode} onChange={this.handleMFAChange}></input>
 						<button onClick={this.handleMFASubmit}>Send MFA</button>
-					</div>}
+					</div>
+
+				}				<div className="box"> 
+					<div className="input-group">
+						<span className="input-group-addon">Username </span>
+						<input className="form-control" size="50" type="text" value={this.state.username} onChange={this.handleUsernameChange}></input>
+					</div>
+					<br/>
+					<label className="login-label">Password</label>
+					<input className="login-input" type="password" value={this.state.password} onChange={this.handlePasswordChange}></input>
+					<button onClick={this.handleSubmit}>Submit</button>
+				</div>
+*/}
+
+				
 			</div>
 			);
 	}

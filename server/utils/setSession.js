@@ -23,8 +23,9 @@ module.exports = (req, res, sessionToken ) => {
     if (!error) {
         body = JSON.parse(body);
         // need to investiate if this is needed,  or if express sessions does this on its own.
-         req.session.body = body;
-         console.log(body);
+         req.session.sessionId = body.id;
+         console.log('set session: ', req.session.sessionId);
+         res.json(body);
     } else {
       console.log('error: ', error);
     }

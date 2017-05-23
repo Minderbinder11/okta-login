@@ -14,31 +14,22 @@ module.exports = (req, res) => {
      { 'cache-control': 'no-cache',
        'authorization': 'SSWS '+ apiKey,
        'content-type': 'application/json',
-       'accept': 'application/json' } 
+       'accept': 'application/json'
+     } 
   };
-
-  // second request to get list of MFAs    
+   
   request(factorOptions, function (error, response, body) {
-    console.log('sending to Okta for MFAs');
     if (error) {
       res.json({error: true});
     } else {
       body = JSON.parse(body);
 
       if (body.length === 0) {
-        // no MFA, send success
-        res.json({
-          success: 'SUCCESS',
-          error: false,
-          mfas: []
-        });
-
+        res.json({error: true});
       } else {
-        console.log('3. Received list of factors');
-
+        // could make this more robus by searching for Google Auth in the array
         var factorId = body[0].id;
         req.session.factorId = factorId;
-
         res.json({
           success: 'SUCCESS',
           mfas: body, 

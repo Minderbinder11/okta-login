@@ -2,14 +2,27 @@
 import React from 'react';
 import axios from 'axios';
 import { Redirect } from 'react-router';
+import AppLink from './appLink.jsx';
 
 class HomePage extends React.Component {
 
   constructor(props) {
     super(props);
     this.handleLogOut = this.handleLogOut.bind(this);
-    this.state = {loggedIn: true};
+    this.state = {
+      loggedIn: true,
+      apps: []
+    };
   } 
+
+  componentDidMount() {
+
+    axios.get('/applinks')
+    .then(response => {
+      this.setState({apps: response.data})
+    });
+
+  }
 
   handleLogOut () {
     axios.get('/logout')
@@ -37,6 +50,9 @@ class HomePage extends React.Component {
 
   render() {
 
+    console.log(this.state.apps)
+    var apps = this.state.apps;
+
       if (this.state.loggedIn) {
         return ( 
           <div>
@@ -45,6 +61,11 @@ class HomePage extends React.Component {
             <div className="addUser" onClick={this.handleAddUser}>
               Add User
             </div>
+            <ul>
+              {apps.map((app) => {
+                return (<AppLink app={app} key={app.id}/>);
+            })}
+              </ul>
           </div>
         );
         } 
