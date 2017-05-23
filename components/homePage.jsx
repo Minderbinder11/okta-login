@@ -1,9 +1,8 @@
 //homePage.jsx
 import React from 'react';
 import axios from 'axios';
-import { Redirect } from 'react-router';
 import AppLink from './appLink.jsx';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 
 
 class HomePage extends React.Component {
@@ -34,14 +33,17 @@ class HomePage extends React.Component {
     });
   }
 
-  handleLogOut () {
+  handleLogOut (e) {
+    e.stopPropagation();
     axios.get('/logout')
     .then(response => {
+      console.log('in logout promise')
       this.setState({loggedIn: false});
     });
   }
 
-  handleAddUser () {
+  handleAddUser (e) {
+    e.stopPropagation();
     axios.post('/adduser', 
       { username: 'john.adams@example.com',
         password: 'BH22escow',
@@ -87,7 +89,7 @@ class HomePage extends React.Component {
         } 
 
         return (
-          <Link />
+          <Redirect to='/' />
           );
 
   } 

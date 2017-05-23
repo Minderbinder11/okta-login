@@ -136,8 +136,7 @@ app.get('/api/getUsers', (req, res) => {
 		method: 'GET',
   	url: oktaUrl + '/api/v1/users',
 	  headers: 
-	   { 'postman-token': 'e6336fda-22ad-e78c-14ad-f30b08c1c058',
-	     'cache-control': 'no-cache',
+	   { 'cache-control': 'no-cache',
 		   'authorization': 'SSWS '+ apiKey,
 	     'content-type': 'application/json',
 	     'accept': 'application/json' } };
@@ -152,40 +151,43 @@ app.get('/api/getUsers', (req, res) => {
 	  	console.log('get Users', body);
 	  }
 	});
+});
 
 app.get('/passwordreset', (req, res) => {
 
   // FIRST I NEED TO GET THE USERID
 
+console.log('emails for reset', req.query.email)
+
   var userOptions = { 
     method: 'GET',
     url: oktaUrl + '/api/v1/users',
-    qs: { q: 'ceasar.chavez@example.com' },
+    qs: { q: req.query.email },
     headers: 
      { 'cache-control': 'no-cache',
-       authorization: 'SSWS 00p_Z5emQrIXfw228qBmju0GtmVdDb3V_Vp0gwkpNb',
+		   'authorization': 'SSWS '+ apiKey,
        'content-type': 'application/json',
-       accept: 'application/json' } };
+       'accept': 'application/json' } 
+  };
 
   request(userOptions, function (error, response, body) {
     if (error) throw new Error(error);
 
-    console.log(body);
-  });
+    body = JSON.parse(body);
+    console.log('body of get user', body);
 
+  	var userId = body[0].id;
 
-  if (req.session.userId) {
-    // call to reser password
     var options = { 
       method: 'POST',
-      url: oktaUrl + '/api/v1/users/'+ req.session.userId +'/lifecycle/reset_password',
-      qs: { sendEmail: 'false' },
+      url: oktaUrl + '/api/v1/users/'+ userId +'/lifecycle/reset_password',
+      qs: { sendEmail: 'true' },
       headers: 
-       { 'postman-token': '9ed9424d-6297-0747-d405-a019730a3df2',
-         'cache-control': 'no-cache',
-         authorization: 'SSWS 00p_Z5emQrIXfw228qBmju0GtmVdDb3V_Vp0gwkpNb',
-         accept: 'application/json',
-         'content-type': 'application/json' } };
+       	{ 'cache-control': 'no-cache',
+		   		'authorization': 'SSWS '+ apiKey,
+         	'accept': 'application/json',
+         	'content-type': 'application/json' } 
+         };
 
     request(options, function (error, response, body) {
       if (error) {
@@ -201,11 +203,8 @@ app.get('/passwordreset', (req, res) => {
       }
     });
 
-  } else {
-    res.json({status: 'NO_USERID'});
-  }
 
-
+  });
 });
 
 app.post('/adduser', (req, res) => {

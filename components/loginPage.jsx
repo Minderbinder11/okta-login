@@ -32,7 +32,10 @@ class LoginPage extends React.Component {
 		this.hanldeActivateMFA			= this.hanldeActivateMFA.bind(this);
 		this.handleMFAActivateCode	= this.handleMFAActivateCode.bind(this);
 		this.resetPassword 					= this.resetPassword.bind(this);
+		this.onBackButtonEvent			= this.onBackButtonEvent.bind(this);
 	}
+
+
 
 	componentDidMount() {
 		axios.get('/isAuth')
@@ -41,9 +44,17 @@ class LoginPage extends React.Component {
 				this.setState({isAuth: true});
 			}
 		});
+
+		window.onpopstate = this.onBackButtonEvent;
 	}
 
-	 handleMFAActivateCode () {
+	onBackButtonEvent (e) {
+  	e.preventDefault();
+ 		this.goBack();
+	}
+
+	
+	handleMFAActivateCode () {
 	
 	 	var code = this.state.mfacode;
 	 	this.setState({
@@ -154,9 +165,9 @@ class LoginPage extends React.Component {
 	}
 
 	resetPassword () {
-		console.log('Ive been clicked');
+		console.log('Ive been clicked: ', this.state.username);
 
-		axios.get('/passwordreset')
+		axios.get('/passwordreset', {params: {email: this.state.username}})
 		.then(response => {
 			console.log(response);
 			if (response.data.status === 'SUCCESS') {
