@@ -2,7 +2,7 @@
 
 .box {
 	margin: 30px auto;
-	background-image: url('img/landingpage.jpg');
+	/*background-image: url('img/landingpage.jpg'); */
 	width: 700px;
 	height: 300px;
 }
@@ -19,8 +19,10 @@
 
 body, html {
     height: 100%;
+    /*
     background-repeat: no-repeat;
     background-image: linear-gradient(rgb(104, 145, 162), rgb(12, 97, 33));
+    */
 }
 
 .card-container.card {
@@ -168,4 +170,59 @@ body, html {
 	text-decoration: none;
 	list-style: none;
 
+}
+
+
+/* ADMIN PAGE
+*/
+
+.user-manager {
+    margin: 10px auto;
+    width: 90%;
+    height: 500px;
+    background-color:  lightgrey;
+}
+
+.status-filter {
+    width: 30%;
+    border: 1px red solid;
+    display: inline-block;
+    margin: 10px;
+    background-color: white;
+}
+
+.status-item {
+    list-style: none;
+    font-size: 12px;
+    font-weight: 400;
+}
+
+.status-list {
+    padding-left: 5px;
+}
+
+.user-list {
+    margin-top: 10px;
+    width: 65%;
+    display: inline-block;
+    vertical-align: top;
+    border: 1px blue solid;
+    background-color: white;
+}
+
+.columnA {
+    width: 50%;
+}
+
+.columnB {
+     width: 40%;
+}
+
+.columnC {
+    width: 20%;
+    text-align: left;  
+}
+
+.selected-row {
+    background-color: lightblue;
 }
