@@ -2,7 +2,7 @@
 
 import React from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Redirect } from 'react-router-dom';
 import AdminTableRow from './adminTableRow.jsx';
 
 
@@ -13,33 +13,53 @@ class AdminPage extends React.Component {
 
 		// eventually move this to MobX
 		this.state = {
+			createUserLink: false,
+			updateUserLink: false,
+			returnHome: false,
 			everyone: [],
-			activeUsers: [],
-			provisionedUsers: [],
-			stagedUsers: [],
-			recoveryUsers: [],
-			deprovisionedUsers:[],
-			passwordExpiredUsers: [],
-			lockedUsers:[],
-			suspendedUsers: [],
 			selected: [],
 			selectedUser: ''
 		};
 
+		this.displayUsers										= this.displayUsers.bind(this);
+		this.homeClick	 										= this.homeClick.bind(this);
+		this.createUser 										= this.createUser.bind(this);
+		this.updateUser 										= this.updateUser.bind(this);
 		this.suspendUser 										= this.suspendUser.bind(this);
 		this.unsuspendUser									= this.unsuspendUser.bind(this);
+		this.deleteUser											= this.deleteUser.bind(this);
 		this.selectUser 										= this.selectUser.bind(this);
-		this.selectActiveUsers							= this.selectActiveUsers.bind(this);
-		this.selectEveryone		 							= this.selectEveryone.bind(this);
-		this.selectProvisionedUsers		 			= this.selectProvisionedUsers.bind(this);
-		this.selectStagedUsers		 					= this.selectStagedUsers.bind(this);
-		this.selectRecoveryUsers		 				= this.selectRecoveryUsers.bind(this);
-		this.selectDeprovisionedUsers		 		= this.selectDeprovisionedUsers.bind(this);
-		this.selectPasswordExpiredUsers		 	= this.selectPasswordExpiredUsers.bind(this);
-		this.selectLockedUsers		 					= this.selectLockedUsers.bind(this);
-		this.selectSuspendedUsers						= this.selectSuspendedUsers.bind(this);
 		this.initializeState								= this.initializeState.bind(this);
 
+	}
+
+	displayUsers (e) {
+		console.log('target', e.target.id)
+		
+		if (e.target.id === 'EVERYONE') {
+			console.log('in everyone')
+			this.setState({selected: this.state.everyone});
+		} else {
+
+			var filterList = this.state.everyone.filter(user => user.status === e.target.id);
+			this.setState({selected: filterList});
+		}
+	}
+
+
+	homeClick () {
+		this.setState({returnHome: true});
+	}
+
+	createUser () {
+		this.setState({createUserLink: true});
+	}
+
+	updateUser () {
+		if (this.state.selectedUser) {
+			console.log('in update user',this.state.selectedUser)
+			this.setState({updateUserLink: true});
+		}
 	}
 
 	unsuspendUser () {
@@ -54,7 +74,8 @@ class AdminPage extends React.Component {
 					this.initializeState();
 				}
 			})
-
+		} else {
+			console.log('no user selected');
 		}
 	}
 
@@ -69,52 +90,31 @@ class AdminPage extends React.Component {
 					this.initializeState();
 				}
 			});
-
 		} else {
+			// send message to user the current user is not active
 			console.log('no selected User or users isnot active')
 		}
+	}
 
+	deleteUser () {
+
+		if (this.state.selectedUser) {
+			axios.post('/api/deleteUser', {userId: this.state.selectedUser.id})
+			.then(response => {
+				console.log('delete callback', response.data)
+				if (response.data.status === 'SUCCESS') {
+					console.log('intialize state');
+					this.initializeState();
+				}
+			});
+		} else {
+			console.log('no user selected')
+		}
 	}
 
 	selectUser(user) {
 		this.setState({selectedUser: user});
 		console.log('selected user', user);
-	}
-
-	selectEveryone () {
-		this.setState({selected: this.state.everyone});
-	}
-
-	selectActiveUsers () {
-		this.setState({selected: this.state.activeUsers});
-	}
-
-	selectProvisionedUsers () {
-		this.setState({selected: this.state.provisionedUsers});
-	}
-
-	selectStagedUsers () {
-		this.setState({selected: this.state.stagedUsers});
-	}
-
-	selectRecoveryUsers () {
-		this.setState({selected: this.state.recoveryUsers});
-	}
-
-	selectDeprovisionedUsers () {
-		this.setState({selected: this.state.deprovisionedUsers});
-	}
-
-	selectPasswordExpiredUsers () {
-		this.setState({selected: this.state.passwordExpiredUsers});
-	}
-
-	selectLockedUsers () {
-		this.setState({selected: this.state.lockedUsers});
-	}
-
-	selectSuspendedUsers () {
-		this.setState({selected: this.state.suspendedUsers});
 	}
 
 	componentDidMount () {
@@ -132,63 +132,16 @@ class AdminPage extends React.Component {
 
 		axios.get('/api/getUsers')
 		.then(response => {
-			console.log('users', response)
-
-			response.data.users.map(user => {
-				switch (user.status) {
-					case 'ACTIVE':
-						everyone.push(user);
-						active.push(user);
-						break;
-					case 'STAGED':
-						everyone.push(user);
-						staged.push(user);
-						break;
-					case 'PROVISIONED':
-						everyone.push(user);
-						provisioned.push(user);
-						break;
-					case 'PASSWORD_EXPIRED':
-						everyone.push(user);
-						passwordExpired.push(user);
-						break;
-					case 'LOCKED_OUT':
-						everyone.push(user);
-						locked.push(user);
-					case 'RECOVERY':
-						everyone.push(user);
-						recovery.push(user);
-						break;
-					case 'DEPROVISIONED':
-						everyone.push(user);
-						deprovisionedUsers.push(user);
-						break;
-					case 'SUSPENDED':
-						everyone.push(user);
-						suspended.push(user);
-						break;
-					default:
-						everyone.push(user);
-						break;
-				}
-
-			});
+			console.log('users', response.data.users)
 
 			this.setState({
-				everyone: everyone,
-				activeUsers: active,
-				provisionedUsers: provisioned,
-				stagedUsers: staged,
-				recoveryUsers: recovery,
-				deprovisionedUsers:deprovisionedUsers,
-				passwordExpiredUses: passwordExpired,
-				lockedUsers:locked,
-				suspendedUsers: suspended
-			});
+				everyone: response.data.users
+				});
 
 			this.setState({
 				selected: this.state.everyone
 			});
+
 		});
 	}
 
@@ -198,6 +151,18 @@ class AdminPage extends React.Component {
 
 		var selected = this.state.selected;
 
+		if (this.state.createUserLink) {
+			 return (<Redirect to='/createUser' />);
+		}
+
+		if (this.state.updateUserLink) {
+			//<Link to={{pathname: '/updateUser/' + this.state.selectedUser.id}}>Update User</Link>
+			return (<Redirect to={{pathname: '/updateUser/' + this.state.selectedUser.id}} />);
+		}
+
+		if (this.state.returnHome) {
+			return (<Redirect to='/api' />)
+		}
 
 		return (
 			<div>
@@ -205,54 +170,53 @@ class AdminPage extends React.Component {
 				<h2> 
 					Administration Page
 				</h2>
-
+				<button onClick={this.homeClick}>Home</button>
 			</div>
 				
-				<Link to='/createUser'>Create User</Link>
-				<Link to={{pathname: '/updateUser/' + this.state.selectedUser.id}}>Update User</Link>
-				<button onClick={this.deleteUSer}> Delete User</button>
+
+				
+				<button onClick={this.createUser}> Create User</button>
+				<button onClick={this.updateUser}> Update User</button>
+				<button onClick={this.deleteUser}> Delete User</button>
 				<button onClick={this.suspendUser}> Suspend User </button>
 				<button onClick={this.unsuspendUser}> Unsuspend User </button>
 
 				<div className="user-manager">
 
-				<div className="status-filter">
-				Filters
-					<ul className="status-list">
-						<li className="status-item" onClick={this.selectEveryone}>Everyone</li>
-						<li className="status-item" onClick={this.selectActiveUsers}>Active</li>
-						<li className="status-item" onClick={this.selectProvisionedUsers}>Provisioned</li>
-						<li className="status-item" onClick={this.selectRecoveryUsers}>Recovery</li>
-						<li className="status-item" onClick={this.selectStagedUsers }>Staged</li>
-						<li className="status-item" onClick={this.selectLockedUsers}>Locked</li>
-						<li className="status-item" onClick={this.selectSuspendedUsers}>Suspended</li>
-						<li className="status-item" onClick={this.selectPasswordExpiredUsers}>Password Expired</li>
-						<li className="status-item" onClick={this.selectDeprovisionedUsers}>Deprovisioned</li>	 					
-					</ul>
+					<div className="status-filter">
+					Filters
+						<ul className="status-list">
+							<li id="EVERYONE" className="status-item" onClick={this.displayUsers}>Everyone</li>
+							<li id="ACTIVE" className="status-item" onClick={this.displayUsers}>Active</li>
+							<li id="PROVISIONED" className="status-item" onClick={this.displayUsers}>Provisioned</li>
+							<li id="RECOVERY" className="status-item" onClick={this.displayUsers}>Recovery</li>
+							<li id="STAGED" className="status-item" onClick={this.displayUsers}>Staged</li>
+							<li id="LOCKED" className="status-item" onClick={this.displayUsers}>Locked</li>
+							<li id="SUSPENDED" className="status-item" onClick={this.displayUsers}>Suspended</li>
+							<li id="PASSWORD_EXPIRED" className="status-item" onClick={this.displayUsers}>Password Expired</li>
+							<li id="DEPROVISIONED" className="status-item" onClick={this.displayUsers}>Deprovisioned</li>	 					
+						</ul>
+					</div>
+					<div className="user-list">
+						<table>
+
+							<thead>
+								<tr>
+	                <th data-field="id" className="columnA">User</th>
+	                <th data-field="name" className="columnB">Email</th>
+	                <th data-field="price" className="columnC">Status</th>
+	               </tr>
+							</thead>
+							<tbody>
+							{
+								selected.map(user => {
+									return (<AdminTableRow user={user} selected={this.state.selectedUser} 
+														key={user.id} selectUser={this.selectUser.bind(this, user)}/>)
+								})}
+							</tbody>
+						</table>
+					</div>
 				</div>
-				<div className="user-list">
-					<table>
-
-						<thead>
-							<tr>
-                <th data-field="id" className="columnA">User</th>
-                <th data-field="name" className="columnB">Email</th>
-                <th data-field="price" className="columnC">Status</th>
-               </tr>
-						</thead>
-						<tbody>
-						{
-							selected.map(user => {
-								return (<AdminTableRow user={user} selected={this.state.selectedUser} 
-													key={user.id} selectUser={this.selectUser.bind(this, user)}/>)
-							})}
-
-
-						</tbody>
-					</table>
-				</div>
-				</div>
-
 			</div>
 			);
 	}

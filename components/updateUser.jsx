@@ -2,7 +2,7 @@
 
 import React from 'react';
 import axios from 'axios';
-import { Redirect } from 'react-router-dom';
+import { Redirect, Link } from 'react-router-dom';
 
 class UpdateUser extends React.Component {
 
@@ -36,16 +36,16 @@ class UpdateUser extends React.Component {
 			console.log('response from get one user', user)
 			
 			this.setState({
-				userUpdated: false,
-				userId: user.id,
-				login: user.profile.login,
-				firstName: user.profile.firstName,
-				lastName: user.profile.lastName,
-				email: user.profile.email,
-				streetAddress: user.profile.streetAddress,
-				city: user.profile.city,
-				state: user.profile.state,
-				zipCode: user.profile.zipCode
+				userUpdated: 		false,
+				userId: 				user.id,
+				login: 					user.profile.login,
+				firstName: 			user.profile.firstName,
+				lastName: 			user.profile.lastName,
+				email: 					user.profile.email,
+				streetAddress: 	user.profile.streetAddress,
+				city: 					user.profile.city,
+				state: 					user.profile.state,
+				zipCode: 				user.profile.zipCode
 			});
 		});
 	}
@@ -138,7 +138,6 @@ class UpdateUser extends React.Component {
 			<input type="text" id="city" className="form-control" value={this.state.city} 
 							onChange={this.cityChange} required></input>
 
-
 			<label>State</label>
 			<input type="text" id="state" className="form-control" value={this.state.state} 
 							onChange={this.stateChange} required></input>
@@ -148,6 +147,7 @@ class UpdateUser extends React.Component {
 							onChange={this.zipChange} required></input>
 
 			<button onClick={this.handleSubmit}>Update</button>
+			<Link to='/admin'>Cancel</Link>
 
 			</div>);
 	}

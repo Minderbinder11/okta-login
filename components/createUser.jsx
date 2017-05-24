@@ -2,7 +2,7 @@
 
 import React from 'react';
 import axios from 'axios';
-import { Redirect } from 'react-router-dom';
+import { Redirect, Link } from 'react-router-dom';
 
 class CreateUser extends React.Component {
 
@@ -123,6 +123,7 @@ class CreateUser extends React.Component {
 							onChange={this.zipChange} required></input>
 
 			<button onClick={this.handleSubmit}>Submit</button>
+			<Link to='/admin'>Cancel</Link>
 
 			</div>);
 	}

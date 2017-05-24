@@ -1,7 +1,7 @@
 //handleLogin.js
 
 import request 			from 'request';
-import getMFAs 			from './getMFAs';
+import getActions 	from './getActions';
 import enrollMFAs		from './enrollMFAs';
 
 const oktaUrl = 'https://dev-477147.oktapreview.com';
@@ -35,7 +35,7 @@ module.exports = ( req, res ) => {
 
 	  	req.session.userId = body._embedded.user.id;
 	  	req.session.sessionToken = body.sessionToken;
-			getMFAs(req, res);
+			getActions.getMFAs(req, res);
 
 		} else if (body.status === 'MFA_ENROLL'){
 			enrollMFAs(req, res, body);
