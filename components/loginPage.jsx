@@ -103,29 +103,26 @@ class LoginPage extends React.Component {
 				username: this.state.username,
 				password: this.state.password })
 		.then(response => {
-			console.log('response', response);
+
 			if (response.data.error) {
-				console.log('login error');
 				this.setState({
 					showLoginError: true,
 					username: '',
 					password: ''
 				});
 			} else if (response.data.status === 'AUTHENTICATED') {
-					console.log('Authenticated');
 				 this.setState({isAuth: true})
 
 			} else if (response.data.status === 'ENROLL'){
-				// here I need to show link to MFA Enrollment
-				console.log('enroll');
+
 				this.setState({
 					mfaEnroll: true,
 					mfaEnrollLink: response.data.href
 				});
 
 			} else {
+				console.log('sould get here')
 				this.setState({showMFA: true});		
-			
 			}
 		})
 		.catch(err => {
@@ -140,6 +137,7 @@ class LoginPage extends React.Component {
 	handleMFASubmit () {
 
 		this.setState({mfaError: false});
+		console.log('mfa code', this.state.mfacode ), 
 		axios.post('/mfa', {
 			mfacode: this.state.mfacode })
 		.then( response => {

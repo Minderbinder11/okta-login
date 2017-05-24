@@ -8,16 +8,15 @@ import session 			 from 'express-session';
 import cookieParser  from 'cookie-parser';
 import setSession 	 from './utils/setSession';
 import handleLogin	 from './utils/handleLogin';
-//import getApps			 from './utils/getApps';
 import validateMFAs	 from './utils/validateMFAs';
 import activateMFAs  from './utils/activateMFAs';
 import deleteUser 	 from './utils/deleteUser';
-//import getUsers			 from './utils/getUsers';
-import getActions			 from './utils/getActions';
-import unsuspendUser from './utils/unsuspendUser';
+import getActions			from './utils/getActions';
+
+import postActions from './utils/postActions';
 
 
-import middlewareActiveSession from './utils/middlewareActiveSession';
+//import middlewareActiveSession from './utils/middlewareActiveSession';
 
 const port = process.env.port || 8000;
 const oktaUrl = 'https://dev-477147.oktapreview.com';
@@ -74,9 +73,7 @@ app.post('/login', (req, res) => {
 });
 
 app.post('/mfaactivate', (req, res) => {
-
 	activateMFAs(req, res);
-
 });
 
 // client sends MFA back to server for validation
@@ -109,101 +106,21 @@ app.post('/api/deleteUser', (req, res) => {
 });
 
 app.post('/api/unsuspendUser', (req, res) => {
-
-	console.log('UNSUSPENND - user ID', req.body.userId);  
-
-	var options = { method: 'POST',
-	  url: oktaUrl + '/api/v1/users/'+ req.body.userId +'/lifecycle/unsuspend',
-	  headers: 
-	   { 'cache-control': 'no-cache',
-		   'authorization': 'SSWS '+ apiKey,
-	     'accept': 'application/json',
-	     'content-type': 'application/json' } };
-
-	request(options, (error, response, body) => {
-	  if (error) {
-	  	throw new Error(error);
-	  	res.json({error: error});
-	  } else {
-	  res.json({status: 'SUCCESS'});
-		}
-	});
+	postActions.unsuspendUser(req, res);
 });
 
 
 app.post('/api/suspendUser', (req, res) => {
-
+	postActions.suspendUser(req, res);
 });
 
 app.post('/api/newuser', (req, res) => {
-
-	var options = { 
-		method: 'POST',
-	  url: oktaUrl + '/api/v1/users',
-	  qs: { activate: 'true' },
-	  headers: 
-	   { 'cache-control': 'no-cache',
-		   'authorization': 'SSWS '+ apiKey,
-	     'content-type': 'application/json',
-	     'accept': 'application/json' },
-	  body: 
-	   { profile: 
-	      { firstName: req.body.firstName,
-	        lastName: req.body.lastName,
-	        email: req.body.email,
-	        login: req.body.username,
-	        streetAddress: req.body.address,
-	        city: req.body.city,
-	        state: req.body.state,
-	        zipCode: req.body.zip
-
-	         },
-	     credentials: { password: { value: req.body.password } } },
-	  json: true };
-
-	request(options, function (error, response, body) {
-	  if (error) {
-	  	throw new Error(error);
-	  	res.json({error: error})
-	  } else {
-	  	res.json({status: 'SUCCESS'});
-	  	console.log(body);
-	  }
-	});
-
+	postActions.newUser(req, res);
 });
 
 
 app.put('/api/updateuser', (req, res) => {
-
-	console.log('req.body', req.body);
-	var userId = req.body.userId;
-	var obj = req.body;
-	delete obj.userId;
-
-
-	var options = { 
-		method: 'POST',
-	  url: oktaUrl + '/api/v1/users/' + userId,
-	  headers: 
-	   { 'authorization': 'SSWS '+ apiKey,
-	     'content-type': 'application/json',
-	     'accept': 'application/json' },
-	  body: 
-	   { profile: obj},
-	  	json: true 
-	  };
-
-	request(options, (error, response, body) => {
-	  if (error) {
-	  	throw new Error(error);
-	  	res.json({error: error})
-	  } else {
-	  	res.json({status: 'SUCCESS'});
-	  	console.log(body);
-	  }
-	});
-
+	postActions.updateUser(req, res);
 });
 
 
@@ -261,42 +178,6 @@ console.log('emails for reset', req.query.email)
   });
 });
 
-app.post('/adduser', (req, res) => {
-	
-	var username = req.body.username;
-	var password = req.body.password;
-	var firstName = req.body.firstname;
-	var lastName = req.body.lastname;
-
-	var options = { 
-		method: 'POST',
-   	url: oktaUrl + '/api/v1/users',
-    qs: { activate: 'false' },
-    headers: 
-     {'cache-control': 'no-cache',
-	    'authorization': 'SSWS '+ apiKey,
-      'content-type': 'application/json',
-      'accept': 'application/json' },
-    body: 
-     { profile: 
-        { firstName: firstName,
-          lastName: lastName,
-          email: username, // check in client that username is an email
-          login: username 
-        },
-       credentials: { password: { value: password } } },
-    json: true 
-	};
-
-	request(options, function (error, response, body) {
-	  if (error) {
-	  	throw new Error(error);
-	  	res.json({status: error});
-	  }
-	  res.json({status: 'SUCCESS'});
-	});
-
-});
 
 app.get('/logout', (req, res) => {
 	req.session.destroy();

@@ -33,7 +33,6 @@ module.exports.getAUser = (req, res) => {
 	});
 };
 
-
 module.exports.getApps = (req, res) => { 
 
 	options.url = oktaUrl + '/api/v1/users/' + req.session.userId + '/appLinks'
@@ -69,7 +68,6 @@ module.exports.getMFAs = (req, res) => {
 
   options.url = oktaUrl + '/api/v1/users/'+ req.session.userId +'/factors';
  
-   
   request(options, (error, response, body) => {
     if (error) {
 	  	throw new Error(error);    	
@@ -79,20 +77,20 @@ module.exports.getMFAs = (req, res) => {
       if (body.length === 0) {
         res.json({error: true});
       } else {
-        // could make this more robus by searching for Google Auth in the array
-        // use a filter here
-        var factorId = body[0].id;
+        var googleAuthenticator = body.filter(factor => {
+        		return	(factor.factorType === "token:software:totp" && factor.provider === 'GOOGLE')});
+        var factorId = googleAuthenticator[0].id;
+
         req.session.factorId = factorId;
         res.json({
           success: 'SUCCESS',
-          mfas: body, 
+          mfas: googleAuthenticator, 
           error: false
         });
       }
     }
   });
 };
-
 
 
 // use this to find the admin users

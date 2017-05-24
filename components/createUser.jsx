@@ -9,9 +9,10 @@ class CreateUser extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			userCreated: false,
+			cancelCreate: false,
+			userCreated: false
 		};
-
+		this.cancel = this.cancel.bind(this);
 		this.zipChange = this.zipChange.bind(this);
 		this.cityChange = this.cityChange.bind(this);
 		this.emailChange = this.emailChange.bind(this);
@@ -22,6 +23,10 @@ class CreateUser extends React.Component {
 		this.lastNameChange = this.lastNameChange.bind(this);
 		this.firstNameChange = this.firstNameChange.bind(this);
 
+	}
+
+	cancel () {
+		this.setState({cancelCreate: true});
 	}
 
 	handleSubmit (e) {
@@ -39,8 +44,8 @@ class CreateUser extends React.Component {
 				zip: 				this.state.zip
 			})
 			.then(response => {
-				console.log('response from create: ', response)
 				if (response.data.status === 'SUCCESS') {
+					console.log('created');
 					this.setState({userCreated: true});
 				}
 			});
@@ -86,6 +91,10 @@ class CreateUser extends React.Component {
 			return (<Redirect to='/admin' />);
 		}
 
+		if (this.state.canelCreate) {
+			return (<Redirect to='/admin' />);
+		}
+
 		return (<div> 
 			<h2>Create User</h2>
 
@@ -123,7 +132,7 @@ class CreateUser extends React.Component {
 							onChange={this.zipChange} required></input>
 
 			<button onClick={this.handleSubmit}>Submit</button>
-			<Link to='/admin'>Cancel</Link>
+			<button onClick={this.cancel}>Cancel</button>
 
 			</div>);
 	}

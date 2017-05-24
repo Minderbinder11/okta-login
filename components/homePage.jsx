@@ -70,9 +70,7 @@ class HomePage extends React.Component {
           <div>
             <h2>Welcome To The HomePage</h2>
             <button onClick={this.handleLogOut}>Log Out</button>
-            <div className="addUser" onClick={this.handleAddUser}>
-              Add User
-            </div>
+
             <ul>
               {apps.map((app) => {
                 return (<AppLink app={app} key={app.id}/>);
@@ -80,7 +78,7 @@ class HomePage extends React.Component {
               </ul>
             { this.state.isAdmin && 
               <div>
-              Does this show up???
+              Administrative Access
               <Link to="/admin">Admin</Link>
               </div>
             }
