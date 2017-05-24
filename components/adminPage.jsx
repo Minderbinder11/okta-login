@@ -2,6 +2,7 @@
 
 import React from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 import AdminTableRow from './adminTableRow.jsx';
 
 
@@ -25,7 +26,8 @@ class AdminPage extends React.Component {
 			selectedUser: ''
 		};
 
-		this.createUser 										= this.createUser.bind(this);
+		this.suspendUser 										= this.suspendUser.bind(this);
+		this.unsuspendUser									= this.unsuspendUser.bind(this);
 		this.selectUser 										= this.selectUser.bind(this);
 		this.selectActiveUsers							= this.selectActiveUsers.bind(this);
 		this.selectEveryone		 							= this.selectEveryone.bind(this);
@@ -36,13 +38,47 @@ class AdminPage extends React.Component {
 		this.selectPasswordExpiredUsers		 	= this.selectPasswordExpiredUsers.bind(this);
 		this.selectLockedUsers		 					= this.selectLockedUsers.bind(this);
 		this.selectSuspendedUsers						= this.selectSuspendedUsers.bind(this);
+		this.initializeState								= this.initializeState.bind(this);
+
+	}
+
+	unsuspendUser () {
+		console.log('Im about to UNsuspend this sucker:', this.state.selectedUser);
+
+		if (this.state.selectedUser && this.state.selectedUser.status === 'SUSPENDED' ) {
+
+			axios.post('/api/unsuspendUser', {userId: this.state.selectedUser.id})
+			.then(response => {
+				console.log('response from suspended user');
+				if (response.data.status === 'SUCCESS'){
+					this.initializeState();
+				}
+			})
+
+		}
+	}
+
+
+	suspendUser () {
+		if (this.state.selectedUser && this.state.selectedUser.status === 'ACTIVE') {
+
+			axios.post('/api/suspendUser', {userId: this.state.selectedUser.id})
+			.then(response => {
+				console.log('response from suspendUser');
+				if (response.data.status === 'SUCCESS') {
+					this.initializeState();
+				}
+			});
+
+		} else {
+			console.log('no selected User or users isnot active')
+		}
 
 	}
 
 	selectUser(user) {
 		this.setState({selectedUser: user});
-		console.log('ive been clicked: ', user);
-		// need to figure out how to unselect the last selected one
+		console.log('selected user', user);
 	}
 
 	selectEveryone () {
@@ -82,6 +118,13 @@ class AdminPage extends React.Component {
 	}
 
 	componentDidMount () {
+
+		this.initializeState();
+	}
+
+	initializeState () {
+
+		console.log('in initialize state');
 
 		var everyone= [], active = [], provisioned = [], staged = [], recovery = [], deprovisionedUsers =[], 
 			passwordExpired = [], locked = [], suspended = [];
@@ -147,17 +190,14 @@ class AdminPage extends React.Component {
 				selected: this.state.everyone
 			});
 		});
-
 	}
 
-	createUser () {
-		// get necessary user info to create a new user
-	}
+
 
 	render() {
 
-		//var active = this.state.activeUsers;
 		var selected = this.state.selected;
+
 
 		return (
 			<div>
@@ -168,8 +208,11 @@ class AdminPage extends React.Component {
 
 			</div>
 				
-				<button onClick={this.createUser}> Create User</button>
+				<Link to='/createUser'>Create User</Link>
+				<Link to={{pathname: '/updateUser/' + this.state.selectedUser.id}}>Update User</Link>
 				<button onClick={this.deleteUSer}> Delete User</button>
+				<button onClick={this.suspendUser}> Suspend User </button>
+				<button onClick={this.unsuspendUser}> Unsuspend User </button>
 
 				<div className="user-manager">
 
@@ -200,11 +243,8 @@ class AdminPage extends React.Component {
 						<tbody>
 						{
 							selected.map(user => {
-								var isSelected = false;
-								if(user === this.state.selectedUser) {
-									isSelected = true;
-								}
-								return (	<AdminTableRow user={user} selected={this.state.selectedUser} key={user.id} selectUser={this.selectUser.bind(this, user)}/>)
+								return (<AdminTableRow user={user} selected={this.state.selectedUser} 
+													key={user.id} selectUser={this.selectUser.bind(this, user)}/>)
 							})}
 
 

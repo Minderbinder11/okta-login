@@ -13,12 +13,10 @@ class AdminTableRow extends React.Component {
 	selectRow(e) {
 		e.preventDefault();
 		this.setState({selected: !this.state.selected});
-		console.log('in table row')
 		this.props.selectUser();
 	}
 
 	render () {
-		//console.log(this.props.user);
 		var classes = '';
 
 		if(this.props.selected === this.props.user) {

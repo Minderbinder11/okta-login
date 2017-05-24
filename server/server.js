@@ -62,11 +62,8 @@ app.get('/isAuth', ( req, res ) => {
 app.post('/login', (req, res) => {
 
 	if(req.session.body) {
-
 		res.json({status: 'AUTHENTICATED'});
-
 	} else {
-
 		handleLogin(req, res);
 	}
 });
@@ -148,10 +145,153 @@ app.get('/api/getUsers', (req, res) => {
 	  } else {
 	  	body = JSON.parse(body);
 	  	res.json({users: body});
-	  	console.log('get Users', body);
+	  	//console.log('get Users', body);
 	  }
 	});
 });
+
+app.get('/api/getUser/:userId', (req, res) => {
+
+	var options = { method: 'GET',
+  url: oktaUrl + '/api/v1/users/' + req.params.userId,
+  headers: 
+   { 'cache-control': 'no-cache',
+		 'authorization': 'SSWS '+ apiKey,
+     'content-type': 'application/json',
+     'accept': 'application/json' } };
+
+	request(options, (error, response, body) => {
+	  if (error) {
+	  	throw new Error(error);
+	  	res.json({error: error})
+	  } else {
+	  	//console.log('user for update: ', body);
+			res.json({
+				status: 'SUCCESS',
+				user: body, 
+			})
+		}
+	});
+});
+
+
+app.post('/api/unsuspendUser', (req, res) => {
+
+	console.log('UNSUSPENND - user ID', req.body.userId);  
+
+	var options = { method: 'POST',
+	  url: oktaUrl + '/api/v1/users/'+ req.body.userId +'/lifecycle/unsuspend',
+	  headers: 
+	   { 'cache-control': 'no-cache',
+		   'authorization': 'SSWS '+ apiKey,
+	     'accept': 'application/json',
+	     'content-type': 'application/json' } };
+
+	request(options, (error, response, body) => {
+	  if (error) {
+	  	throw new Error(error);
+	  	res.json({error: error});
+	  } else {
+	  res.json({status: 'SUCCESS'});
+		}
+	});
+});
+
+
+app.post('/api/suspendUser', (req, res) =>{
+
+	console.log('user ID', req.body.userId);  
+
+	var options = { method: 'POST',
+	  url: oktaUrl + '/api/v1/users/'+ req.body.userId +'/lifecycle/suspend',
+	  headers: 
+	   { 'cache-control': 'no-cache',
+		   'authorization': 'SSWS '+ apiKey,
+	     'accept': 'application/json',
+	     'content-type': 'application/json' } };
+
+	request(options, (error, response, body) => {
+	  if (error) {
+	  	throw new Error(error);
+	  	res.json({error: error});
+	  } else {
+	  res.json({status: 'SUCCESS'});
+		}
+	});
+
+});
+
+app.post('/api/newuser', (req, res) => {
+
+	var options = { 
+		method: 'POST',
+	  url: oktaUrl + '/api/v1/users',
+	  qs: { activate: 'true' },
+	  headers: 
+	   { 'cache-control': 'no-cache',
+		   'authorization': 'SSWS '+ apiKey,
+	     'content-type': 'application/json',
+	     'accept': 'application/json' },
+	  body: 
+	   { profile: 
+	      { firstName: req.body.firstName,
+	        lastName: req.body.lastName,
+	        email: req.body.email,
+	        login: req.body.username,
+	        streetAddress: req.body.address,
+	        city: req.body.city,
+	        state: req.body.state,
+	        zipCode: req.body.zip
+
+	         },
+	     credentials: { password: { value: req.body.password } } },
+	  json: true };
+
+	request(options, function (error, response, body) {
+	  if (error) {
+	  	throw new Error(error);
+	  	res.json({error: error})
+	  } else {
+	  	res.json({status: 'SUCCESS'});
+	  	console.log(body);
+	  }
+	});
+
+});
+
+
+app.put('/api/updateuser', (req, res) => {
+
+	console.log('req.body', req.body);
+	var userId = req.body.userId;
+	var obj = req.body;
+	delete obj.userId;
+
+
+	var options = { 
+		method: 'POST',
+	  url: oktaUrl + '/api/v1/users/' + userId,
+	  headers: 
+	   { 'authorization': 'SSWS '+ apiKey,
+	     'content-type': 'application/json',
+	     'accept': 'application/json' },
+	  body: 
+	   { profile: obj},
+	  	json: true 
+	  };
+
+	request(options, (error, response, body) => {
+	  if (error) {
+	  	throw new Error(error);
+	  	res.json({error: error})
+	  } else {
+	  	res.json({status: 'SUCCESS'});
+	  	console.log(body);
+	  }
+	});
+
+});
+
 
 app.get('/passwordreset', (req, res) => {
 
