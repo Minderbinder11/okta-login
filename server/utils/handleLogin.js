@@ -3,6 +3,7 @@
 import request 			from 'request';
 import getActions 	from './getActions';
 import enrollMFAs		from './enrollMFAs';
+import postActions	from './postActions';
 
 const oktaUrl = 'https://dev-477147.oktapreview.com';
 const apiKey = '00p_Z5emQrIXfw228qBmju0GtmVdDb3V_Vp0gwkpNb';
@@ -27,6 +28,7 @@ module.exports = ( req, res ) => {
 
 	request(options, (error, response, body) => {
 
+		console.log('handle login body', body);
 		if(error) {
 			throw new Error(error);
 			res.json({error: error});
@@ -38,7 +40,7 @@ module.exports = ( req, res ) => {
 			getActions.getMFAs(req, res);
 
 		} else if (body.status === 'MFA_ENROLL'){
-			enrollMFAs(req, res, body);
+			postActions.enrollMFAs(req, res, body);
 		} else {
 		  res.json({error: true});
 		}

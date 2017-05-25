@@ -2,8 +2,13 @@
 
 import request from 'request';
 
-const oktaUrl = 'https://dev-477147.oktapreview.com';
-const apiKey = '00p_Z5emQrIXfw228qBmju0GtmVdDb3V_Vp0gwkpNb';
+import config from '../../config.json';
+
+// const oktaUrl = 'https://dev-477147.oktapreview.com';
+// const apiKey = '00p_Z5emQrIXfw228qBmju0GtmVdDb3V_Vp0gwkpNb';
+
+const oktaUrl = config.oktaUrl;
+const apiKey = config.API_KEY;
 
 var options = { 
 	method: 'POST',
@@ -14,6 +19,34 @@ var options = {
    	'content-type': 'application/json' 
    } 
  };
+
+module.exports.enrollMFAs = (req, res, body) => { 
+
+	req.session.userId = body._embedded.user.id;
+
+	options.url = oktaUrl + '/api/v1/users/'+ body._embedded.user.id +'/factors',
+	options.body = { 
+		factorType: 'token:software:totp', 
+	  	provider: 'GOOGLE' 
+	  };
+	options.json= true;
+
+	request(options, (error, response, body) => {
+	  
+	  if (error) {
+	  	throw new Error(error);
+	  	res.json({error: error});  	
+	  } else {
+		  req.session.factorId = body.id;
+		  res.json({
+		  	href: body._embedded.activation._links.qrcode.href,
+		  	status: 'ENROLL'
+		  });
+		}
+	});
+	
+};
+
 
 module.exports.newUser = (req, res) => {
 
@@ -74,7 +107,7 @@ module.exports.updateUser = (req, res) => {
 	  	res.json({status: 'SUCCESS'});
 	  }
 	});
-	
+
 };
 
 
@@ -106,5 +139,24 @@ module.exports.suspendUser = (req, res) => {
 	  res.json({status: 'SUCCESS'});
 		}
 	});
+
+};
+
+module.exports.passwordReset = (req, res, userId) => {
+
+  options.url = oktaUrl + '/api/v1/users/'+ userId +'/lifecycle/reset_password';
+  options.qs = { sendEmail: 'true' };
+
+  request(options, (error, response, body) => {
+    if (error) {
+      throw new Error(error);
+      res.json({error: error});
+    } else {
+      res.json({
+        status: 'SUCCESS',
+        link: body
+      });
+    }
+  });
 
 };

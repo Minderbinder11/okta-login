@@ -125,57 +125,7 @@ app.put('/api/updateuser', (req, res) => {
 
 
 app.get('/passwordreset', (req, res) => {
-
-  // FIRST I NEED TO GET THE USERID
-
-console.log('emails for reset', req.query.email)
-
-  var userOptions = { 
-    method: 'GET',
-    url: oktaUrl + '/api/v1/users',
-    qs: { q: req.query.email },
-    headers: 
-     { 'cache-control': 'no-cache',
-		   'authorization': 'SSWS '+ apiKey,
-       'content-type': 'application/json',
-       'accept': 'application/json' } 
-  };
-
-  request(userOptions, function (error, response, body) {
-    if (error) throw new Error(error);
-
-    body = JSON.parse(body);
-    console.log('body of get user', body);
-
-  	var userId = body[0].id;
-
-    var options = { 
-      method: 'POST',
-      url: oktaUrl + '/api/v1/users/'+ userId +'/lifecycle/reset_password',
-      qs: { sendEmail: 'true' },
-      headers: 
-       	{ 'cache-control': 'no-cache',
-		   		'authorization': 'SSWS '+ apiKey,
-         	'accept': 'application/json',
-         	'content-type': 'application/json' } 
-         };
-
-    request(options, function (error, response, body) {
-      if (error) {
-        throw new Error(error);
-        res.json({error: error});
-      } else {
-      
-        console.log('reset password body', body);
-        res.json({
-          status: 'SUCCESS',
-          link: body
-        });
-      }
-    });
-
-
-  });
+	getActions.passwordReset(req, res);
 });
 
 

@@ -1,10 +1,14 @@
 // getAUser.js
 
 import request from 'request';
+import postActions from './postActions';
+import config from '../../config.json';
 
-const oktaUrl = 'https://dev-477147.oktapreview.com';
-const apiKey = '00p_Z5emQrIXfw228qBmju0GtmVdDb3V_Vp0gwkpNb';
+// const oktaUrl = 'https://dev-477147.oktapreview.com';
+// const apiKey = '00p_Z5emQrIXfw228qBmju0GtmVdDb3V_Vp0gwkpNb';
 
+const oktaUrl = config.oktaUrl;
+const apiKey = config.API_KEY;
 
 var options = {
 	method: 'GET',
@@ -47,6 +51,7 @@ module.exports.getApps = (req, res) => {
 		}
 	});
 };
+
 // gets all users
 module.exports.getUsers = (req, res) => {
 
@@ -66,9 +71,13 @@ module.exports.getUsers = (req, res) => {
 
 module.exports.getMFAs = (req, res) => {
 
+	console.log('in get mfas');
+
   options.url = oktaUrl + '/api/v1/users/'+ req.session.userId +'/factors';
  
   request(options, (error, response, body) => {
+  	console.log('mfsa body', body);
+
     if (error) {
 	  	throw new Error(error);    	
       res.json({error: true});
@@ -81,6 +90,7 @@ module.exports.getMFAs = (req, res) => {
         		return	(factor.factorType === "token:software:totp" && factor.provider === 'GOOGLE')});
         var factorId = googleAuthenticator[0].id;
 
+        console.log('in success')
         req.session.factorId = factorId;
         res.json({
           success: 'SUCCESS',
@@ -120,6 +130,21 @@ module.exports.getGroups = (req, res) => {
 		  }
 		}
 	});
-
-
 };
+
+module.exports.passwordReset = (req, res) => {
+
+ options.url = oktaUrl + '/api/v1/users';
+ options.qs = { q: req.query.email };
+
+request(options, function (error, response, body) {
+  if (error) throw new Error(error);
+
+  body = JSON.parse(body);
+	var userId = body[0].id;
+
+	postActions.passwordReset(req, res, userId);
+	});
+};
+
+
