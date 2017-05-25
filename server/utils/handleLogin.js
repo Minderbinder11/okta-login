@@ -2,7 +2,7 @@
 
 import request 			from 'request';
 import getActions 	from './getActions';
-import enrollMFAs		from './enrollMFAs';
+//import enrollMFAs		from './enrollMFAs';
 import postActions	from './postActions';
 
 const oktaUrl = 'https://dev-477147.oktapreview.com';
