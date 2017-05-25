@@ -18,7 +18,8 @@ class AdminPage extends React.Component {
 			returnHome: false,
 			everyone: [],
 			selected: [],
-			selectedUser: ''
+			selectedUser: '',
+			currentlySelectedStage: 'EVERYONE'
 		};
 
 		this.displayUsers										= this.displayUsers.bind(this);
@@ -34,15 +35,19 @@ class AdminPage extends React.Component {
 	}
 
 	displayUsers (e) {
-		console.log('target', e.target.id)
-		
-		if (e.target.id === 'EVERYONE') {
-			console.log('in everyone')
-			this.setState({selected: this.state.everyone});
-		} else {
 
+		if (e.target.id === 'EVERYONE') {
+			this.setState({
+				selected: this.state.everyone,
+				currentlySelectedStage: e.target.id
+			});
+		} else {
 			var filterList = this.state.everyone.filter(user => user.status === e.target.id);
-			this.setState({selected: filterList});
+			this.setState({
+				selected: filterList,
+				currentlySelectedStage: e.target.id
+			});
+			
 		}
 	}
 
@@ -92,7 +97,7 @@ class AdminPage extends React.Component {
 			});
 		} else {
 			// send message to user the current user is not active
-			console.log('no selected User or users isnot active')
+			console.log('no selected User or users is not active')
 		}
 	}
 
@@ -117,46 +122,81 @@ class AdminPage extends React.Component {
 		console.log('selected user', user);
 	}
 
-	componentDidMount () {
+	componentWillMount () {
+		var lifecycleStages = [
+			{ 
+				name: "ACTIVE", 
+				count: 0 
+			},{ 
+				name: "PROVISIONED", 
+				count: 0 
+			},{ 
+				name: "RECOVERY", 
+				count: 0 
+			},{ 
+				name: "STAGED", 
+				count: 0 
+			},{ 
+				name: "LOCKED", 
+				count: 0 
+			},{ 
+				name: "SUSPENDED",
+				count: 0  
+			},{ 
+				name: "PASSWORD_EXPIRED", 
+				count: 0 
+			},{ 
+				name: "DEPROVISIONED",
+				count: 0 
+			}
+		];
+		this.setState({lifecycleStages: lifecycleStages});
+	}
 
+	componentDidMount () {
 		this.initializeState();
 	}
 
 	initializeState () {
 
-		console.log('in initialize state');
-
-		var everyone= [], active = [], provisioned = [], staged = [], recovery = [], deprovisionedUsers =[], 
-			passwordExpired = [], locked = [], suspended = [];
-
-
 		axios.get('/api/getUsers')
 		.then(response => {
-			console.log('users', response.data.users)
-
 			this.setState({
-				everyone: response.data.users
-				});
-
-			this.setState({
+				everyone: response.data.users,
 				selected: this.state.everyone
 			});
+	
+			var lifecycleStages = this.state.lifecycleStages;
+			var obj = {}, results = [];
+			
+			lifecycleStages.map(stage => {
+				var users = this.state.everyone.filter(user =>
+					user.status === stage.name);
+				obj = {
+					name: stage.name,
+					count: users.length
+				};
+				results.push(obj);
+			});
 
+			obj = {
+				name: 'EVERYONE',
+				count: this.state.everyone.length
+			};
+			results.unshift(obj);
+			this.setState({ lifecycleStages: results });
 		});
 	}
-
-
 
 	render() {
 
 		var selected = this.state.selected;
-
+		
 		if (this.state.createUserLink) {
 			 return (<Redirect to='/createUser' />);
 		}
 
 		if (this.state.updateUserLink) {
-			//<Link to={{pathname: '/updateUser/' + this.state.selectedUser.id}}>Update User</Link>
 			return (<Redirect to={{pathname: '/updateUser/' + this.state.selectedUser.id}} />);
 		}
 
@@ -164,6 +204,8 @@ class AdminPage extends React.Component {
 			return (<Redirect to='/api' />)
 		}
 
+	var lifecycleStages = this.state.lifecycleStages;
+	var classes = "list-group-item status-item";
 		return (
 			<div>
 			<div>
@@ -171,30 +213,29 @@ class AdminPage extends React.Component {
 					Administration Page
 				</h2>
 				<button onClick={this.homeClick}>Home</button>
-			</div>
-				
-
-				
+			</div>				
 				<button onClick={this.createUser}> Create User</button>
 				<button onClick={this.updateUser}> Update User</button>
 				<button onClick={this.deleteUser}> Delete User</button>
 				<button onClick={this.suspendUser}> Suspend User </button>
 				<button onClick={this.unsuspendUser}> Unsuspend User </button>
-
 				<div className="user-manager">
-
 					<div className="status-filter">
 					Filters
 						<ul className="status-list">
-							<li id="EVERYONE" className="status-item" onClick={this.displayUsers}>Everyone</li>
-							<li id="ACTIVE" className="status-item" onClick={this.displayUsers}>Active</li>
-							<li id="PROVISIONED" className="status-item" onClick={this.displayUsers}>Provisioned</li>
-							<li id="RECOVERY" className="status-item" onClick={this.displayUsers}>Recovery</li>
-							<li id="STAGED" className="status-item" onClick={this.displayUsers}>Staged</li>
-							<li id="LOCKED" className="status-item" onClick={this.displayUsers}>Locked</li>
-							<li id="SUSPENDED" className="status-item" onClick={this.displayUsers}>Suspended</li>
-							<li id="PASSWORD_EXPIRED" className="status-item" onClick={this.displayUsers}>Password Expired</li>
-							<li id="DEPROVISIONED" className="status-item" onClick={this.displayUsers}>Deprovisioned</li>	 					
+							{lifecycleStages.map(stage => {
+								console.log(this.state.currentlySelectedStage);
+								if (this.state.currentlySelectedStage === stage.name) {
+									classes += " active"
+								} else {
+									classes = "list-group-item status-item";
+								}
+							return 	(<li id={stage.name} className={classes} 
+									onClick={this.displayUsers} key={stage.name}>
+									<span className="badge">{stage.count}</span>
+									{stage.name}
+							</li>)
+						})}
 						</ul>
 					</div>
 					<div className="user-list">

@@ -1,11 +1,10 @@
 // setSession.js
 import request from 'request';
+import config from '../../config.json';
 
-const oktaUrl = 'https://dev-477147.oktapreview.com';
+const oktaUrl = config.oktaUrl;
 
 module.exports = (req, res, sessionToken ) => {
-
-  ///req.session.views = 1;
 
   var options = {
     url: oktaUrl + '/api/v1/sessions',
@@ -22,7 +21,6 @@ module.exports = (req, res, sessionToken ) => {
     console.log('in sessions callback');
     if (!error) {
         body = JSON.parse(body);
-        // need to investiate if this is needed,  or if express sessions does this on its own.
          req.session.sessionId = body.id;
          console.log('set session: ', req.session.sessionId);
          

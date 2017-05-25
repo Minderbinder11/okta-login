@@ -4,9 +4,6 @@ import request from 'request';
 import postActions from './postActions';
 import config from '../../config.json';
 
-// const oktaUrl = 'https://dev-477147.oktapreview.com';
-// const apiKey = '00p_Z5emQrIXfw228qBmju0GtmVdDb3V_Vp0gwkpNb';
-
 const oktaUrl = config.oktaUrl;
 const apiKey = config.API_KEY;
 
