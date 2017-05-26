@@ -8,6 +8,8 @@ import LoginPage from './loginPage.jsx';
 import CreateUser from './createUser.jsx';
 import UpdateUser from './updateUser.jsx';
 import { BrowserRouter, Route, Link } from 'react-router-dom';
+import App from './app.jsx';
+
 
 ReactDOM.render(
 	<BrowserRouter>

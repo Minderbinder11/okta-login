@@ -19,18 +19,20 @@ class AdminPage extends React.Component {
 			everyone: [],
 			selected: [],
 			selectedUser: '',
-			currentlySelectedStage: 'EVERYONE'
+			currentlySelectedStage: 'EVERYONE',
+			logoutClick: false
 		};
 
-		this.displayUsers										= this.displayUsers.bind(this);
-		this.homeClick	 										= this.homeClick.bind(this);
-		this.createUser 										= this.createUser.bind(this);
-		this.updateUser 										= this.updateUser.bind(this);
-		this.suspendUser 										= this.suspendUser.bind(this);
-		this.unsuspendUser									= this.unsuspendUser.bind(this);
-		this.deleteUser											= this.deleteUser.bind(this);
-		this.selectUser 										= this.selectUser.bind(this);
-		this.initializeState								= this.initializeState.bind(this);
+		this.handleLogOut 			= this.handleLogOut.bind(this);
+		this.displayUsers				= this.displayUsers.bind(this);
+		this.homeClick	 				= this.homeClick.bind(this);
+		this.createUser 				= this.createUser.bind(this);
+		this.updateUser 				= this.updateUser.bind(this);
+		this.suspendUser 				= this.suspendUser.bind(this);
+		this.unsuspendUser			= this.unsuspendUser.bind(this);
+		this.deleteUser					= this.deleteUser.bind(this);
+		this.selectUser 				= this.selectUser.bind(this);
+		this.initializeState		= this.initializeState.bind(this);
 
 	}
 
@@ -47,34 +49,40 @@ class AdminPage extends React.Component {
 				selected: filterList,
 				currentlySelectedStage: e.target.id
 			});
-			
 		}
 	}
 
+  handleLogOut (e) {
+    e.stopPropagation();
+    axios.get('/logout')
+    .then(response => {
+      this.setState({logoutClick: true});
+    });
+  }
 
-	homeClick () {
+	homeClick (e) {
+		e.stopPropagation();		
 		this.setState({returnHome: true});
 	}
 
-	createUser () {
+	createUser (e) {
+		e.stopPropagation();		
 		this.setState({createUserLink: true});
 	}
 
-	updateUser () {
+	updateUser (e) {
+		e.stopPropagation();
 		if (this.state.selectedUser) {
-			console.log('in update user',this.state.selectedUser)
 			this.setState({updateUserLink: true});
 		}
 	}
 
-	unsuspendUser () {
-		console.log('Im about to UNsuspend this sucker:', this.state.selectedUser);
+	unsuspendUser (e) {
+		e.stopPropagation();
 
 		if (this.state.selectedUser && this.state.selectedUser.status === 'SUSPENDED' ) {
-
 			axios.post('/api/unsuspendUser', {userId: this.state.selectedUser.id})
 			.then(response => {
-				console.log('response from suspended user');
 				if (response.data.status === 'SUCCESS'){
 					this.initializeState();
 				}
@@ -85,12 +93,12 @@ class AdminPage extends React.Component {
 	}
 
 
-	suspendUser () {
+	suspendUser (e) {
+		e.stopPropagation();		
 		if (this.state.selectedUser && this.state.selectedUser.status === 'ACTIVE') {
 
 			axios.post('/api/suspendUser', {userId: this.state.selectedUser.id})
 			.then(response => {
-				console.log('response from suspendUser');
 				if (response.data.status === 'SUCCESS') {
 					this.initializeState();
 				}
@@ -101,14 +109,12 @@ class AdminPage extends React.Component {
 		}
 	}
 
-	deleteUser () {
-
+	deleteUser (e) {
+		e.stopPropagation();
 		if (this.state.selectedUser) {
 			axios.post('/api/deleteUser', {userId: this.state.selectedUser.id})
 			.then(response => {
-				console.log('delete callback', response.data)
 				if (response.data.status === 'SUCCESS') {
-					console.log('intialize state');
 					this.initializeState();
 				}
 			});
@@ -119,7 +125,7 @@ class AdminPage extends React.Component {
 
 	selectUser(user) {
 		this.setState({selectedUser: user});
-		console.log('selected user', user);
+		//console.log('selected user', user);
 	}
 
 	componentWillMount () {
@@ -155,6 +161,7 @@ class AdminPage extends React.Component {
 
 	componentDidMount () {
 		this.initializeState();
+
 	}
 
 	initializeState () {
@@ -185,6 +192,7 @@ class AdminPage extends React.Component {
 			};
 			results.unshift(obj);
 			this.setState({ lifecycleStages: results });
+			this.setState({selected: this.state.everyone});
 		});
 	}
 
@@ -204,16 +212,38 @@ class AdminPage extends React.Component {
 			return (<Redirect to='/api' />)
 		}
 
+		if (this.state.logoutClick) {
+			return (<Redirect to='/' />)
+		}
+
 	var lifecycleStages = this.state.lifecycleStages;
 	var classes = "list-group-item status-item";
 		return (
-			<div>
-			<div>
-				<h2> 
-					Administration Page
-				</h2>
-				<button onClick={this.homeClick}>Home</button>
-			</div>				
+			<div className="container-fluid">
+			    <nav className="navbar navbar-default">
+             <div className="container-fluid">
+                <div className="navbar-header">
+                  <button type="button" className="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                    <span className="sr-only">Toggle navigation</span>
+                    <span className="icon-bar"></span>
+                    <span className="icon-bar"></span>
+                    <span className="icon-bar"></span>
+                  </button>
+                  <a className="navbar-brand" href="">
+                    <img alt="Brand" src="img/updateUser.png" height="30px"/>
+                  </a>
+                </div>
+                <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                  <ul className="nav navbar-nav">
+                    <li><a href="#" onClick={this.homeClick}>Home</a></li>
+                    <li><a href="/admin">Applications</a></li>
+                    <li className="active"><a href="#">Admin<span className="sr-only">(current)</span></a></li>
+                    <li><a href="#" onClick={this.handleLogOut}>Logout</a></li>                 
+                  </ul>
+                </div>
+              </div>
+          </nav>
+								
 				<button onClick={this.createUser}> Create User</button>
 				<button onClick={this.updateUser}> Update User</button>
 				<button onClick={this.deleteUser}> Delete User</button>
@@ -221,10 +251,9 @@ class AdminPage extends React.Component {
 				<button onClick={this.unsuspendUser}> Unsuspend User </button>
 				<div className="user-manager">
 					<div className="status-filter">
-					Filters
-						<ul className="status-list">
+					<div className="filterLabel"> Filters</div>
+						<ul className="status-list col-md-3">
 							{lifecycleStages.map(stage => {
-								console.log(this.state.currentlySelectedStage);
 								if (this.state.currentlySelectedStage === stage.name) {
 									classes += " active"
 								} else {
@@ -238,16 +267,21 @@ class AdminPage extends React.Component {
 						})}
 						</ul>
 					</div>
-					<div className="user-list">
-						<table>
+					<div className="user-list col-md-9">
+      				<div className="panel panel-default">
+        				<div className="panel-heading">
+          				<h4>Fixed Header Scrolling Table</h4>
+        				</div>
+						<table className="table table-striped ">
 
 							<thead>
 								<tr>
-	                <th data-field="id" className="columnA">User</th>
-	                <th data-field="name" className="columnB">Email</th>
-	                <th data-field="price" className="columnC">Status</th>
+	                <th className="col-md-6">User</th>
+	                <th className="col-md-4">Email</th>
+	                <th className="col-md-2">Status</th>
 	               </tr>
 							</thead>
+
 							<tbody>
 							{
 								selected.map(user => {
@@ -255,8 +289,10 @@ class AdminPage extends React.Component {
 														key={user.id} selectUser={this.selectUser.bind(this, user)}/>)
 								})}
 							</tbody>
+
 						</table>
-					</div>
+						</div>
+						</div>
 				</div>
 			</div>
 			);

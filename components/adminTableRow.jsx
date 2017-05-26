@@ -1,6 +1,7 @@
 //adminTableRow.jsx
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 class AdminTableRow extends React.Component {
 
@@ -27,9 +28,11 @@ class AdminTableRow extends React.Component {
 
 		return (
 			<tr onClick={this.selectRow} className={classes}>
-				<td className="columnA">{this.props.user.profile.firstName} {this.props.user.profile.lastName}</td>
-				<td className="columnB">{this.props.user.profile.email}</td>
-				<td className="columnC">{this.props.user.status}</td>	
+				<td className="col-md-6"><Link to={{pathname: '/updateUser/' + this.props.user.id}}>
+					{this.props.user.profile.firstName} {this.props.user.profile.lastName}</Link>
+				</td>
+				<td className="col-md-4">{this.props.user.profile.email}</td>
+				<td className="col-md-2">{this.props.user.status}</td>	
 			</tr>
 			);
 	}

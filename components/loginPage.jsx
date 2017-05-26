@@ -186,28 +186,58 @@ class LoginPage extends React.Component {
 
 	render(){
 
+		var style = {
+			width: '350px',
+			backgroundColor: 'rgb(247, 247, 247)',
+			padding: '20px',
+			margin: '0 auto 25px',
+			marginTop: '50px',
+			borderRadius: '2px',
+			boxShadow:  '0px 2px 2px rgba(0, 0, 0, 0.3)'
+		};
+		
+		var profileImageCard = {
+			width: '96px',
+	    height: '96px',
+	    margin: '0 auto 10px',
+	    display: 'block',
+	    // -moz-border-radius: 50%;
+	    // -webkit-border-radius: 50%;
+	    borderRadius: '50%'
+		};
+
+		var inputStyle = {
+			margin: '10px auto'
+		};
+
 		if(this.state.isAuth){
-			return (
-				<Redirect to='/api' />
-				);
+			return ( <Redirect to='/api' />);
 		}
 
 
 		return (
 			<div>
-
 				{this.state.mfaError && <div className="alert alert-danger login-message" role="alert"> 
 					Incorrect Google Authenticator Code
 				</div>}
 
 	    <div className="container">
+	    	<nav className="navbar navbar-default">
+	    		<div className="navbar-header">
+      			<a className="navbar-brand" href="#">
+        			<img alt="Brand" src="img/updateUser.png" height="30px"/>
+      			</a>
+    			</div>
+	    	</nav>
+	    	<div className="login-pane" style={style}>
 	      <div className="card card-container">
-	        <img id="profile-img" className="profile-img-card" src="//ssl.gstatic.com/accounts/ui/avatar_2x.png" />
+	        <img id="profile-img" className="profile-img-card" style={profileImageCard} src="//ssl.gstatic.com/accounts/ui/avatar_2x.png" />
 	        <p id="profile-name" className="profile-name-card"></p>
 	        <div className="form-signin">
             <span id="reauth-email" className="reauth-email"></span>
             <input 	type="email" 
             				id="inputEmail" 
+            				style={inputStyle}
             				className="form-control" 
             				placeholder="Email address" 
             				value={this.state.username} 
@@ -222,11 +252,7 @@ class LoginPage extends React.Component {
             				value={this.state.password} 
             				onChange={this.handlePasswordChange} 
             				required></input>
-            <div id="remember" className="checkbox">
-	            <label>
-	                <input type="checkbox" value="remember-me"></input>
-	            </label>
-            </div>
+            
             <button className="btn btn-lg btn-primary btn-block btn-signin" type="submit" onClick={this.handleSubmit}>Sign in</button>
         	</div>
             <a href="#" className="forgot-password" onClick={this.resetPassword}>
@@ -266,7 +292,7 @@ class LoginPage extends React.Component {
 					</div>}
 	        </div>
 	    	</div>					
-
+	    	</div>
 			</div>
 			);
 	}

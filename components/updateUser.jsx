@@ -10,9 +10,15 @@ class UpdateUser extends React.Component {
 		super(props);
 		this.state = {
 			userUpdated: false,
+			logoutClick: false,
+			returnHome: false,
+			cancelUpdate: false,
 			userId: this.props.match.params.userId,
 		};
 
+		this.homeClick = this.homeClick.bind(this);
+		this.handleLogOut 	= this.handleLogOut.bind(this);		
+		this.handleCancel = this.handleCancel.bind(this);
 		this.zipChange = this.zipChange.bind(this);
 		this.cityChange = this.cityChange.bind(this);
 		this.emailChange = this.emailChange.bind(this);
@@ -25,15 +31,12 @@ class UpdateUser extends React.Component {
 
 	}
 
-	componentDidMount (){
-
-		console.log('userid params', this.props.match.params.userId);
+	componentDidMount () {
 
 		axios.get('/api/getUser/' + this.props.match.params.userId)
 		.then(response => {
 			var user = response.data.user;
 			user = JSON.parse(user);
-			console.log('response from get one user', user)
 			
 			this.setState({
 				userUpdated: 		false,
@@ -50,57 +53,80 @@ class UpdateUser extends React.Component {
 		});
 	}
 
+	homeClick (e) {
+		e.stopPropagation();		
+		this.setState({returnHome: true});
+	}
 
+	handleCancel (e) {
+		e.stopPropagation();
+		this.setState({cancelUpdate: true});
+	}
+
+	handleLogOut (e) {
+    e.stopPropagation();
+    axios.get('/logout')
+    .then(response => {
+      this.setState({logoutClick: true});
+    });
+	}
 
 	handleSubmit (e) {
-			e.stopPropagation();
+		e.stopPropagation();
 
-			var obj = {};
-			for (var key in this.state) {
-				if (this.state[key]){
-					obj[key] = this.state[key];
-				}
+		var obj = {};
+		for (var key in this.state) {
+			if (this.state[key]){
+				obj[key] = this.state[key];
 			}
+		}
 
-			axios.put('/api/updateuser', obj)
-			.then(response => {
-				console.log('response from create: ', response)
-				if (response.data.status === 'SUCCESS') {
-					this.setState({userUpdated: true});
-				}
-			});
+		axios.put('/api/updateuser', obj)
+		.then(response => {
+			if (response.data.status === 'SUCCESS') {
+				this.setState({userUpdated: true});
+			}
+		});
 
 	}
 
 	usernameChange (e) {
+		e.stopPropagation();
 		this.setState({login: e.target.value});
 	}
 
 	firstNameChange (e) {
+		e.stopPropagation();
 		this.setState({firstName: e.target.value});
 	}
 
 	lastNameChange (e) {
+		e.stopPropagation();
 		this.setState({lastName: e.target.value});
 	}
 
 	emailChange (e) {
+		e.stopPropagation();
 		this.setState({email: e.target.value});
 	}
 
 	addressChange (e) {
+		e.stopPropagation();
 		this.setState({streetAddress: e.target.value});
 	}
 
 	cityChange (e) {
+		e.stopPropagation();		
 		this.setState({city: e.target.value});
 	}
 
 	stateChange (e) {
+		e.stopPropagation();		
 		this.setState({state: e.target.value});
 	}
 
 	zipChange (e) {
+		e.stopPropagation();		
 		this.setState({zipCode: e.target.value});
 	}
 
@@ -111,11 +137,48 @@ class UpdateUser extends React.Component {
 			return (<Redirect to='/admin' />);
 		}
 
-		return (<div> 
+		if (this.state.logoutClick) {
+			return (<Redirect to='/' />)
+		}
+
+		if (this.state.returnHome) {
+			return (<Redirect to='/api' />);
+		}
+
+		if (this.state.cancelUpdate) {
+			return (<Redirect to= '/admin'/>);
+		}
+
+		return (
+			<div className="container"> 
+			    <nav className="navbar navbar-default">
+             <div className="container-fluid">
+                <div className="navbar-header">
+                  <button type="button" className="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                    <span className="sr-only">Toggle navigation</span>
+                    <span className="icon-bar"></span>
+                    <span className="icon-bar"></span>
+                    <span className="icon-bar"></span>
+                  </button>
+                  <a className="navbar-brand" href="">
+                    <img alt="Brand" src="../img/updateUser.png" height="30px"/>
+                  </a>
+                </div>
+                <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                  <ul className="nav navbar-nav">
+                    <li><a href="#" onClick={this.homeClick}>Home</a></li>
+                    <li><a href="/admin">Applications</a></li>
+                    <li className="active"><a href="#">Admin<span className="sr-only">(current)</span></a></li>
+                    <li><a href="#" onClick={this.handleLogOut}>Logout</a></li>                 
+                  </ul>
+                </div>
+              </div>
+          </nav>
+
 			<h2>Update User</h2>
 
 			<label>Username</label>
-			<input type="email" id="login" className="form-control" value={this.state.login} 
+			<input type="text" id="login" className="form-control" value={this.state.login} 
 							onChange={this.usernameChange} required autoFocus></input>
 
 			<label>First Name</label>
@@ -127,7 +190,7 @@ class UpdateUser extends React.Component {
 							onChange={this.lastNameChange} required></input>
 
 			<label>Email</label>
-			<input type="email" id="email" className="form-control" value={this.state.email} 
+			<input type="text" id="email" className="form-control" value={this.state.email} 
 							onChange={this.emailChange} required></input>
 
 			<label>Address</label>
@@ -147,7 +210,7 @@ class UpdateUser extends React.Component {
 							onChange={this.zipChange} required></input>
 
 			<button onClick={this.handleSubmit}>Update</button>
-			<Link to='/admin'>Cancel</Link>
+			<button onClick={this.handleCancel}>Cancel</button>
 
 			</div>);
 	}

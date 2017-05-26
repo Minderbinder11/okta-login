@@ -9,12 +9,14 @@ class HomePage extends React.Component {
 
   constructor(props) {
     super(props);
-    this.handleLogOut = this.handleLogOut.bind(this);
     this.state = {
       loggedIn: true,
       admin: false,
+      adminRedirect: false,
       apps: []
     };
+    this.adminRedirect = this.adminRedirect.bind(this);
+    this.handleLogOut = this.handleLogOut.bind(this);
   } 
 
   componentDidMount() {
@@ -33,62 +35,68 @@ class HomePage extends React.Component {
     });
   }
 
+  adminRedirect (e) {
+    e.stopPropagation();
+    this.setState({adminRedirect: true})
+  }
+
   handleLogOut (e) {
     e.stopPropagation();
     axios.get('/logout')
     .then(response => {
-      console.log('in logout promise')
+      //console.log('in logout promise')
       this.setState({loggedIn: false});
     });
   }
 
-  handleAddUser (e) {
-    e.stopPropagation();
-    axios.post('/adduser', 
-      { username: 'john.adams@example.com',
-        password: 'BH22escow',
-        firstname: 'John',
-        lastname: 'Adams'
-    })
-    .then(response => {
-      if(response.data.status === 'ERROR') {
-        console.log('error');
-      } else if (response.data.status === 'SUCCESS') {
-        console.log('added users');
-      }
-    });
-
-  }
-
   render() {
 
-    console.log(this.state.apps)
     var apps = this.state.apps;
 
-      if (this.state.loggedIn) {
-        return ( 
-          <div>
-            <h2>Welcome To The HomePage</h2>
-            <button onClick={this.handleLogOut}>Log Out</button>
+    if(this.state.adminRedirect) {
+     return  <Redirect to="/admin" />
+    }
 
-            <ul>
-              {apps.map((app) => {
-                return (<AppLink app={app} key={app.id}/>);
-            })}
-              </ul>
-            { this.state.isAdmin && 
-              <div>
-              Administrative Access
-              <Link to="/admin">Admin</Link>
+    if (this.state.loggedIn) {
+      return ( 
+        <div className="container">
+
+          <nav className="navbar navbar-default">
+             <div className="container-fluid">
+                <div className="navbar-header">
+                  <button type="button" className="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                    <span className="sr-only">Toggle navigation</span>
+                    <span className="icon-bar"></span>
+                    <span className="icon-bar"></span>
+                    <span className="icon-bar"></span>
+                  </button>
+                  <a className="navbar-brand" href="">
+                    <img src="img/updateUser.png" height="30"/>
+                  </a>
+                </div>
+                <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                  <ul className="nav navbar-nav">
+                    <li className="active"><a href="#">Home<span className="sr-only">(current)</span></a></li>
+                    <li><a href="#">Applications</a></li>
+                    <li><a href="#" onClick={this.adminRedirect}>Admin</a></li>
+                    <li><a href="#" onClick={this.handleLogOut}>Logout</a></li>                 
+                  </ul>
+                </div>
               </div>
-            }
-          </div>
-        );
-        } 
+          </nav>
 
-        return (
-          <Redirect to='/' />
-          );
+          <ul>
+            {apps.map((app) => {
+              return (<AppLink app={app} key={app.id}/>);
+          })}
+            </ul>
+        </div>
+      );
+      } 
+
+      return (
+        <Redirect to='/' />
+        );
 
   } 
 

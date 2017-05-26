@@ -10,25 +10,44 @@ class CreateUser extends React.Component {
 		super(props);
 		this.state = {
 			cancelCreate: false,
-			userCreated: false
+			userCreated: false,
+			logoutClick: false,
+			returnHOme: false
 		};
-		this.cancel = this.cancel.bind(this);
-		this.zipChange = this.zipChange.bind(this);
-		this.cityChange = this.cityChange.bind(this);
-		this.emailChange = this.emailChange.bind(this);
-		this.stateChange = this.stateChange.bind(this);
-		this.handleSubmit = this.handleSubmit.bind(this);
-		this.addressChange = this.addressChange.bind(this);
-		this.usernameChange = this.usernameChange.bind(this);
-		this.lastNameChange = this.lastNameChange.bind(this);
-		this.firstNameChange = this.firstNameChange.bind(this);
+
+		this.homeClick				= this.homeClick.bind(this);
+		this.handleLogOut 		= this.handleLogOut.bind(this);
+		this.cancel 					= this.cancel.bind(this);
+		this.zipChange 				= this.zipChange.bind(this);
+		this.cityChange 			= this.cityChange.bind(this);
+		this.emailChange 			= this.emailChange.bind(this);
+		this.stateChange 			= this.stateChange.bind(this);
+		this.handleSubmit 		= this.handleSubmit.bind(this);
+		this.addressChange 		= this.addressChange.bind(this);
+		this.usernameChange 	= this.usernameChange.bind(this);
+		this.lastNameChange 	= this.lastNameChange.bind(this);
+		this.firstNameChange 	= this.firstNameChange.bind(this);
 
 	}
 
-	cancel () {
+	cancel (e) {
+		e.stopPropagation();
 		this.setState({cancelCreate: true});
 	}
 
+	handleLogOut (e) {
+    e.stopPropagation();
+    axios.get('/logout')
+    .then(response => {
+      this.setState({logoutClick: true});
+    });
+  }
+
+  homeClick (e) {
+		e.stopPropagation();  	
+		this.setState({returnHome: true});
+	}
+	
 	handleSubmit (e) {
 			e.stopPropagation();
 
@@ -45,42 +64,48 @@ class CreateUser extends React.Component {
 			})
 			.then(response => {
 				if (response.data.status === 'SUCCESS') {
-					console.log('created');
 					this.setState({userCreated: true});
 				}
 			});
-
 	}
 
 	usernameChange (e) {
+		e.stopPropagation();		
 		this.setState({username: e.target.value});
 	}
 
 	firstNameChange (e) {
+		e.stopPropagation();		
 		this.setState({firstName: e.target.value});
 	}
 
 	lastNameChange (e) {
+		e.stopPropagation();		
 		this.setState({lastName: e.target.value});
 	}
 
 	emailChange (e) {
+		e.stopPropagation();		
 		this.setState({email: e.target.value});
 	}
 
 	addressChange (e) {
+		e.stopPropagation();		
 		this.setState({address: e.target.value});
 	}
 
 	cityChange (e) {
+		e.stopPropagation();		
 		this.setState({city: e.target.value});
 	}
 
 	stateChange (e) {
+		e.stopPropagation();		
 		this.setState({state: e.target.value});
 	}
 
 	zipChange (e) {
+		e.stopPropagation();		
 		this.setState({zip: e.target.value});
 	}
 
@@ -91,15 +116,48 @@ class CreateUser extends React.Component {
 			return (<Redirect to='/admin' />);
 		}
 
-		if (this.state.canelCreate) {
-			return (<Redirect to='/admin' />);
+		if (this.state.logoutClick) {
+			return (<Redirect to='/' />)
 		}
 
-		return (<div> 
+		if(this.state.returnHome) {
+			return (<Redirect to='/api' />);
+		}
+
+		if (this.state.cancelCreate) {
+			return (<Redirect to='/admin'/>);
+		}
+
+		return (
+			<div className="container"> 
+        <nav className="navbar navbar-default">
+          <div className="container-fluid">
+            <div className="navbar-header">
+              <button type="button" className="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span className="sr-only">Toggle navigation</span>
+                <span className="icon-bar"></span>
+                <span className="icon-bar"></span>
+                <span className="icon-bar"></span>
+              </button>
+              <a className="navbar-brand" href="">
+                <img alt="Brand" src="img/updateUser.png" height="30px"/>
+              </a>
+            </div>
+            <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+              <ul className="nav navbar-nav">
+                <li><a href="#" onClick={this.homeClick}>Home<span className="sr-only">(current)</span></a></li>
+                <li><a href="#">Applications</a></li>
+                <li className="active"><a href="#">Admin</a></li>
+                <li><a href="#" onClick={this.handleLogOut}>Logout</a></li>                 
+              </ul>
+            </div>
+          </div>
+         </nav>
+
 			<h2>Create User</h2>
 
 			<label>Username</label>
-			<input type="email" id="username" className="form-control" value={this.state.username} 
+			<input type="text" id="username" className="form-control" value={this.state.username} 
 							onChange={this.usernameChange} required autoFocus></input>
 
 			<label>First Name</label>
@@ -111,7 +169,7 @@ class CreateUser extends React.Component {
 							onChange={this.lastNameChange} required></input>
 
 			<label>Email</label>
-			<input type="email" id="email" className="form-control" value={this.state.email} 
+			<input type="text" id="email" className="form-control" value={this.state.email} 
 							onChange={this.emailChange} required></input>
 
 			<label>Address</label>
@@ -131,7 +189,7 @@ class CreateUser extends React.Component {
 			<input type="text" id="zip" className="form-control" value={this.state.zip} 
 							onChange={this.zipChange} required></input>
 
-			<button onClick={this.handleSubmit}>Submit</button>
+			<button onClick={this.handleSubmit}>Update</button>
 			<button onClick={this.cancel}>Cancel</button>
 
 			</div>);

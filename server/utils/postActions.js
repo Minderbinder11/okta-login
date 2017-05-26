@@ -50,14 +50,14 @@ module.exports.newUser = (req, res) => {
 	options.qs = { activate: 'true' },
 	options.body = { 
 		profile: { 
-			firstName: req.body.firstName,
-      lastName: req.body.lastName,
-      email: req.body.email,
-      login: req.body.username,
-      streetAddress: req.body.address,
-      city: req.body.city,
-      state: req.body.state,
-      zipCode: req.body.zip
+			firstName: 			req.body.firstName,
+      lastName: 			req.body.lastName,
+      email: 					req.body.email,
+      login: 					req.body.username,
+      streetAddress: 	req.body.address,
+      city: 					req.body.city,
+      state: 					req.body.state,
+      zipCode: 				req.body.zip
      },
     credentials: { 
      	password: { value: req.body.password } 

@@ -45,7 +45,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 function requireLogin(req, res, next) {
 	console.log('in requireloign middleware');
   if (req.session.userId) {
-  	console.log('require Login approved next');
+  	console.log('require Login approved next');  
     return next();
   } else {
     res.redirect('/');
