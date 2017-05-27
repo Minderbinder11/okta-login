@@ -32,7 +32,6 @@ class LoginPage extends React.Component {
 		this.hanldeActivateMFA			= this.hanldeActivateMFA.bind(this);
 		this.handleMFAActivateCode	= this.handleMFAActivateCode.bind(this);
 		this.resetPassword 					= this.resetPassword.bind(this);
-		this.onBackButtonEvent			= this.onBackButtonEvent.bind(this);
 	}
 
 
@@ -44,15 +43,7 @@ class LoginPage extends React.Component {
 				this.setState({isAuth: true});
 			}
 		});
-
-		window.onpopstate = this.onBackButtonEvent;
 	}
-
-	onBackButtonEvent (e) {
-  	e.preventDefault();
- 		this.goBack();
-	}
-
 	
 	handleMFAActivateCode () {
 	

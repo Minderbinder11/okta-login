@@ -4,6 +4,7 @@ import React from 'react';
 import axios from 'axios';
 import { Redirect } from 'react-router-dom';
 import AdminTableRow from './adminTableRow.jsx';
+import { DropdownButton, MenuItem } from 'react-bootstrap';
 
 
 class AdminPage extends React.Component {
@@ -243,12 +244,31 @@ class AdminPage extends React.Component {
                 </div>
               </div>
           </nav>
-								
-				<button onClick={this.createUser}> Create User</button>
-				<button onClick={this.updateUser}> Update User</button>
-				<button onClick={this.deleteUser}> Delete User</button>
-				<button onClick={this.suspendUser}> Suspend User </button>
-				<button onClick={this.unsuspendUser}> Unsuspend User </button>
+
+    <DropdownButton bsStyle={"primary"} title={"User Actions"} id={"1"}>
+      <MenuItem onClick={this.createUser}>Create User</MenuItem>
+      { this.state.selectedUser &&
+      <MenuItem onClick={this.updateUser}>Update User</MenuItem>}
+      { this.state.selectedUser &&
+      <MenuItem onClick={this.deleteUser}>Delete User</MenuItem>}
+    </DropdownButton>
+					
+    <DropdownButton bsStyle={"primary"} title={"Lifecycle Actions"} id={"2"}>
+    { this.state.selectedUser.status ==='STAGED' &&
+      <MenuItem onClick={this.createUser}>Activate User</MenuItem>}
+      <MenuItem onClick={this.updateUser}>Deactivate User</MenuItem>
+    { this.state.selectedUser.status === 'LOCKED_OUT' &&
+      <MenuItem onClick={this.unlockUser}>Unlock User</MenuItem>} 
+    {  this.state.selectedUser.status !== 'PASSWORD_EXPIRED' &&
+      <MenuItem onClick={this.expirePassword}>Expire Password</MenuItem>}
+    {  this.state.selectedUser.status === 'RECOVERY' &&
+      <MenuItem onClick={this.resetUser}>Reset User</MenuItem>}
+    { this.state.selectedUser.status ==='ACTIVE' &&
+      <MenuItem onClick={this.suspendUser}>Suspend User</MenuItem>}
+    { this.state.selectedUser.status ==='SUSPENDED' &&
+      <MenuItem onClick={this.unsuspendUser}>Suspend User</MenuItem>}
+    </DropdownButton>
+
 				<div className="user-manager">
 					<div className="status-filter">
 					<div className="filterLabel"> Filters</div>
