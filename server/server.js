@@ -63,70 +63,74 @@ app.get('/isAuth', ( req, res ) => {
 	}
 });
 
-app.post('/login', (req, res) => {
+/*
+ * LOGIN POST ACTIONS
+ */
 
-	if(req.session.body) {
-		res.json({status: 'AUTHENTICATED'});
-	} else {
-		handleLogin(req, res);
-	}
-});
+	app.post('/login', (req, res) => {
 
-app.post('/mfaactivate', (req, res) => {
-	activateMFAs(req, res);
-});
+		if(req.session.body) {
+			res.json({status: 'AUTHENTICATED'});
+		} else {
+			handleLogin(req, res);
+		}
+	});
 
-// client sends MFA back to server for validation
-app.post('/mfa', (req, res) => {
-	validateMFAs(req, res);	
-});
+	app.post('/mfaactivate', (req, res) => {
+		activateMFAs(req, res);
+	});
 
-// get list of apps client is provisioned for
-app.get('/api/applinks', (req, res) => {
-	getActions.getApps(req, res);
-});
+	// client sends MFA back to server for validation
+	app.post('/mfa', (req, res) => {
+		validateMFAs(req, res);	
+	});
 
-
-app.get('/api/groups', (req, res) => {
-	getActions.getGroups(req, res);
-});
-
-
-app.get('/api/getUsers', (req, res) => {
-	getActions.getUsers(req, res);
-});
-
-
-app.get('/api/getUser/:userId', (req, res) => {
-	getActions.getAUser(req,res);
-});
-
-app.post('/api/deleteUser', (req, res) => {
-	deleteUser(req, res);
-});
-
-app.post('/api/unsuspendUser', (req, res) => {
-	postActions.unsuspendUser(req, res);
-});
-
-
-app.post('/api/suspendUser', (req, res) => {
-	postActions.suspendUser(req, res);
-});
-
-app.post('/api/newuser', (req, res) => {
-	postActions.newUser(req, res);
-});
-
-
-app.put('/api/updateuser', (req, res) => {
-	postActions.updateUser(req, res);
-});
-
-
+// check on this to see if this should be a post
+// this is for login
 app.get('/passwordreset', (req, res) => {
 	getActions.passwordReset(req, res);
 });
+
+
+/*
+ * API POST ACTIONS
+ */
+
+	app.post('/api/activateUser',(req, res) => { postActions.activateUser(req, res); });
+	app.post('/api/deleteUser', (req, res) => { deleteUser(req, res); });
+	app.post('/api/unsuspendUser', (req, res) => { postActions.unsuspendUser(req, res); });
+	app.post('/api/suspendUser', (req, res) => { postActions.suspendUser(req, res); });
+	app.post('/api/newuser', (req, res) => { postActions.newUser(req, res); });
+	app.post('/api/passwordExpire', (req, res) => { postActions.passwordExpire(req, res); });
+
+/*
+ * API GET ACTIONS
+ */
+	app.get('/api/applinks', (req, res) => {
+		getActions.getApps(req, res);
+	});
+
+	app.get('/api/groups', (req, res) => {
+		getActions.getGroups(req, res);
+	});
+
+
+	app.get('/api/getUsers', (req, res) => {
+		getActions.getUsers(req, res);
+	});
+
+
+	app.get('/api/getUser/:userId', (req, res) => {
+		getActions.getAUser(req,res);
+	});
+
+/*
+ * API PUT ACTIONS
+ */
+	app.put('/api/updateuser', (req, res) => {
+		postActions.updateUser(req, res);
+	});
+
 
 
 app.get('/logout', (req, res) => {

@@ -40,7 +40,6 @@ module.exports.enrollMFAs = (req, res, body) => {
 		  });
 		}
 	});
-	
 };
 
 
@@ -76,6 +75,22 @@ module.exports.newUser = (req, res) => {
 	});
 };
 
+module.exports.activateUser = (req, res) => {
+
+	options.url = oktaUrl + '/api/v1/users/'+ req.body.userId +'/lifecycle/activate';
+  options.qs = { sendEmail: 'false' };
+
+	request(options, function (error, response, body) {
+	  if (error) {
+	  	throw new Error(error);
+	  	res.json({error: error});
+	  } else {
+	  	res.json({status: 'SUCCESS'})
+	  }
+	});
+
+};
+ 
 module.exports.updateUser = (req, res) => {
 
 	var userId = req.body.userId;
@@ -83,17 +98,9 @@ module.exports.updateUser = (req, res) => {
 	delete obj.userId;
 
 
-	var options = { 
-		method: 'POST',
-	  url: oktaUrl + '/api/v1/users/' + userId,
-	  headers: 
-	   { 'authorization': 'SSWS '+ apiKey,
-	     'content-type': 'application/json',
-	     'accept': 'application/json' },
-	  body: 
-	   { profile: obj},
-	  	json: true 
-	  };
+	options.url = oktaUrl + '/api/v1/users/' + userId;
+	options.body = {profile: obj};
+	options.json = true;
 
 	request(options, (error, response, body) => {
 	  if (error) {
@@ -138,6 +145,8 @@ module.exports.suspendUser = (req, res) => {
 
 };
 
+
+// check on the userID field,  shouldnt this come from req.body.userId?
 module.exports.passwordReset = (req, res, userId) => {
 
   options.url = oktaUrl + '/api/v1/users/'+ userId +'/lifecycle/reset_password';
@@ -156,3 +165,27 @@ module.exports.passwordReset = (req, res, userId) => {
   });
 
 };
+
+
+module.exports.passwordExpire = (req, res ) => {
+
+  options.url = oktaUrl + '/api/v1/users/'+ req.body.userId +'/lifecycle/expire_password';
+  options.qs = { tempPassword: false };
+
+  request(options, (error, response, body) => {
+    if (error) {
+      throw new Error(error);
+      res.json({error: error});
+    } else {
+      res.json({
+        status: 'SUCCESS',
+        link: body
+      });
+    }
+  });
+
+};
+
+
+
+

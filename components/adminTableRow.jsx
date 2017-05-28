@@ -20,6 +20,8 @@ class AdminTableRow extends React.Component {
 	render () {
 		var classes = '';
 
+		console.log('admin row state selected', this.state.selected)
+
 		if(this.props.selected === this.props.user && this.state.selected) {
 			classes = "table-row selected-row"
 		} else{
@@ -36,7 +38,6 @@ class AdminTableRow extends React.Component {
 			</tr>
 			);
 	}
-
 }
 
 module.exports = AdminTableRow;

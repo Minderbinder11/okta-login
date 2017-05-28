@@ -24,17 +24,44 @@ class AdminPage extends React.Component {
 			logoutClick: false
 		};
 
+		this.initializeState		= this.initializeState.bind(this);
 		this.handleLogOut 			= this.handleLogOut.bind(this);
 		this.displayUsers				= this.displayUsers.bind(this);
 		this.homeClick	 				= this.homeClick.bind(this);
-		this.createUser 				= this.createUser.bind(this);
-		this.updateUser 				= this.updateUser.bind(this);
+		this.selectUser 				= this.selectUser.bind(this);
+
+		// lifecycle actions
 		this.suspendUser 				= this.suspendUser.bind(this);
 		this.unsuspendUser			= this.unsuspendUser.bind(this);
-		this.deleteUser					= this.deleteUser.bind(this);
-		this.selectUser 				= this.selectUser.bind(this);
-		this.initializeState		= this.initializeState.bind(this);
+		this.activateUser				= this.activateUser.bind(this);
+		this.passwordExpire  		= this.passwordExpire.bind(this);
 
+		// user actions
+		this.createUser 				= this.createUser.bind(this);
+		this.deleteUser					= this.deleteUser.bind(this);
+		this.updateUser 				= this.updateUser.bind(this);
+
+	}
+
+	activateUser (e) {
+		e.stopPropagation();
+		axios.post('/api/activateUser', {userId: this.state.selectedUser.id})
+		.then(response=>{
+			if (response.data.status === 'SUCCESS'){
+					this.initializeState();
+			}
+		});
+
+	}
+
+	passwordExpire (e) {
+		e.stopPropagation();
+				axios.post('/api/passwordExpire', {userId: this.state.selectedUser.id})
+		.then(response=>{
+			if (response.data.status === 'SUCCESS'){
+					this.initializeState();
+			}
+		});
 	}
 
 	displayUsers (e) {
@@ -46,6 +73,7 @@ class AdminPage extends React.Component {
 			});
 		} else {
 			var filterList = this.state.everyone.filter(user => user.status === e.target.id);
+			console.log('filetred List', filterList)
 			this.setState({
 				selected: filterList,
 				currentlySelectedStage: e.target.id
@@ -125,8 +153,11 @@ class AdminPage extends React.Component {
 	}
 
 	selectUser(user) {
+		if(this.state.selectedUser === user){
+			this.setState({selectedUser: ''})
+		} else {
 		this.setState({selectedUser: user});
-		//console.log('selected user', user);
+		}
 	}
 
 	componentWillMount () {
@@ -166,6 +197,8 @@ class AdminPage extends React.Component {
 	}
 
 	initializeState () {
+	
+	console.log('in initializeState');
 
 		axios.get('/api/getUsers')
 		.then(response => {
@@ -200,6 +233,7 @@ class AdminPage extends React.Component {
 	render() {
 
 		var selected = this.state.selected;
+		//console.log('selected List', this.state.selected);
 		
 		if (this.state.createUserLink) {
 			 return (<Redirect to='/createUser' />);
@@ -217,8 +251,8 @@ class AdminPage extends React.Component {
 			return (<Redirect to='/' />)
 		}
 
-	var lifecycleStages = this.state.lifecycleStages;
-	var classes = "list-group-item status-item";
+		var lifecycleStages = this.state.lifecycleStages;
+		var classes = "list-group-item status-item";
 		return (
 			<div className="container-fluid">
 			    <nav className="navbar navbar-default">
@@ -252,22 +286,30 @@ class AdminPage extends React.Component {
       { this.state.selectedUser &&
       <MenuItem onClick={this.deleteUser}>Delete User</MenuItem>}
     </DropdownButton>
-					
+		
+		{ this.state.selectedUser &&			
     <DropdownButton bsStyle={"primary"} title={"Lifecycle Actions"} id={"2"}>
-    { this.state.selectedUser.status ==='STAGED' &&
-      <MenuItem onClick={this.createUser}>Activate User</MenuItem>}
-      <MenuItem onClick={this.updateUser}>Deactivate User</MenuItem>
-    { this.state.selectedUser.status === 'LOCKED_OUT' &&
-      <MenuItem onClick={this.unlockUser}>Unlock User</MenuItem>} 
-    {  this.state.selectedUser.status !== 'PASSWORD_EXPIRED' &&
-      <MenuItem onClick={this.expirePassword}>Expire Password</MenuItem>}
-    {  this.state.selectedUser.status === 'RECOVERY' &&
-      <MenuItem onClick={this.resetUser}>Reset User</MenuItem>}
-    { this.state.selectedUser.status ==='ACTIVE' &&
-      <MenuItem onClick={this.suspendUser}>Suspend User</MenuItem>}
-    { this.state.selectedUser.status ==='SUSPENDED' &&
-      <MenuItem onClick={this.unsuspendUser}>Suspend User</MenuItem>}
-    </DropdownButton>
+    
+	    { this.state.selectedUser.status ==='STAGED' &&
+	      <MenuItem onClick={this.activateUser}>Activate User</MenuItem>}
+	      <MenuItem onClick={this.updateUser}>Deactivate User</MenuItem>
+	    { this.state.selectedUser.status === 'LOCKED_OUT' &&
+	      <MenuItem onClick={this.unlockUser}>Unlock User</MenuItem>} 
+	    {  this.state.selectedUser.status !== 'PASSWORD_EXPIRED' &&
+	      <MenuItem onClick={this.passwordExpire}>Expire Password</MenuItem>}
+	    {  this.state.selectedUser.status === 'RECOVERY' &&
+	      <MenuItem onClick={this.resetUser}>Reset User</MenuItem>}
+	    { this.state.selectedUser.status ==='ACTIVE' &&
+	      <MenuItem onClick={this.suspendUser}>Suspend User</MenuItem>}
+	    { this.state.selectedUser.status ==='SUSPENDED' &&
+	      <MenuItem onClick={this.unsuspendUser}>Unsuspend User</MenuItem>}
+    </DropdownButton> }
+
+    {!this.state.selectedUser && 
+ 			<DropdownButton bsStyle={"primary"} title={"Lifecycle Actions"} id={"2"}>
+ 			<MenuItem>No User Selected</MenuItem>
+ 			</DropdownButton>
+    }
 
 				<div className="user-manager">
 					<div className="status-filter">
