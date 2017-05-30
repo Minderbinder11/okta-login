@@ -3,6 +3,7 @@
 import React from 'react';
 import axios from 'axios';
 import { Redirect, Link } from 'react-router-dom';
+import { Button } from 'react-bootstrap';
 
 class UpdateUser extends React.Component {
 
@@ -209,8 +210,8 @@ class UpdateUser extends React.Component {
 			<input type="text" id="zip" className="form-control" value={this.state.zipCode} 
 							onChange={this.zipChange} required></input>
 
-			<button onClick={this.handleSubmit}>Update</button>
-			<button onClick={this.handleCancel}>Cancel</button>
+			<Button bsStyle="primary" onClick={this.handleSubmit}>Update</Button>
+			<Button onClick={this.handleCancel}>Cancel</Button>
 
 			</div>);
 	}

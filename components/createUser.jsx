@@ -3,6 +3,8 @@
 import React from 'react';
 import axios from 'axios';
 import { Redirect, Link } from 'react-router-dom';
+import { DropdownButton, MenuItem } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 
 class CreateUser extends React.Component {
 
@@ -53,7 +55,7 @@ class CreateUser extends React.Component {
 
 			axios.post('/api/newuser', {
 				username: 	this.state.username,
-				password: 	this.state.password,
+				password: 	'BH22escow',
 				firstName: 	this.state.firstName,
 				lastName: 	this.state.lastName,
 				email: 			this.state.email,
@@ -189,8 +191,8 @@ class CreateUser extends React.Component {
 			<input type="text" id="zip" className="form-control" value={this.state.zip} 
 							onChange={this.zipChange} required></input>
 
-			<button onClick={this.handleSubmit}>Update</button>
-			<button onClick={this.cancel}>Cancel</button>
+			<Button bsStyle="primary" onClick={this.handleSubmit}>Create User</Button>
+			<Button onClick={this.cancel}>Cancel</Button>
 
 			</div>);
 	}

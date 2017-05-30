@@ -4,8 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "clean": "rm -rf build && mkdir build",
+    "build-server": "babel -d ./build ./server -s",
+    "build": "npm run clean && npm run build-server",
     "start": "nodemon server/server.js --exec babel-node --presets es2015",
-    "start-webpack": "webpack --config webpack.config.js --progress --colors --watch"
+    "start-webpack": "webpack --config webpack.config.js --progress --colors --watch",
+    "start-prod": "node ./build/server.js"
   },
   "keywords": [],
   "author": "",

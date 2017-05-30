@@ -112,7 +112,6 @@ class LoginPage extends React.Component {
 				});
 
 			} else {
-				console.log('sould get here')
 				this.setState({showMFA: true});		
 			}
 		})

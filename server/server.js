@@ -96,12 +96,16 @@ app.get('/passwordreset', (req, res) => {
  * API POST ACTIONS
  */
 
-	app.post('/api/activateUser',(req, res) => { postActions.activateUser(req, res); });
-	app.post('/api/deleteUser', (req, res) => { deleteUser(req, res); });
-	app.post('/api/unsuspendUser', (req, res) => { postActions.unsuspendUser(req, res); });
-	app.post('/api/suspendUser', (req, res) => { postActions.suspendUser(req, res); });
-	app.post('/api/newuser', (req, res) => { postActions.newUser(req, res); });
+	app.post('/api/activateUser',		(req, res) => { postActions.activateUser(req, res); });
+	app.post('/api/deleteUser', 		(req, res) => { deleteUser(req, res); });
+	app.post('/api/unsuspendUser', 	(req, res) => { postActions.unsuspendUser(req, res); });
+	app.post('/api/suspendUser', 		(req, res) => { postActions.suspendUser(req, res); });
+	app.post('/api/newuser', 				(req, res) => { postActions.newUser(req, res); });
 	app.post('/api/passwordExpire', (req, res) => { postActions.passwordExpire(req, res); });
+	app.post('/api/deactivateUser', (req, res) => { postActions.deactivateUser(req, res); });
+  app.post('/api/reactivateUser', (req, res) => { postActions.reactivateUser(req, res); });
+  app.post('/api/unlockUser', 		(req, res) => { postActions.unlockUser(req, res); });
+
 
 /*
  * API GET ACTIONS

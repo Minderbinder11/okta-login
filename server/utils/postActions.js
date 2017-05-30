@@ -16,6 +16,48 @@ var options = {
    } 
  };
 
+module.exports.unlockUser = (req, res) => {
+	options.url = oktaUrl + '/api/v1/users/'+ req.body.userId +'/lifecycle/unlock';
+
+	request(options, function (error, response, body) {
+	  if (error) {
+	  	throw new Error(error);
+	  	res.json({error: error});
+	  } else {
+	  	res.json({status: 'SUCCESS'})
+	  }
+	});
+};
+
+
+module.exports.reactivateUser = (req, res) => {
+
+	options.url = oktaUrl + '/api/v1/users/'+ req.body.userId +'/lifecycle/reactivate?sendEmail=true';
+
+	request(options, function (error, response, body) {		
+	  if (error) {
+	  	throw new Error(error);
+	  	res.json({error: error});
+	  } else {
+	  	res.json({status: 'SUCCESS'})
+	  }
+	});
+};
+
+module.exports.deactivateUser = (req, res) => {
+
+	options.url = oktaUrl + '/api/v1/users/'+ req.body.userId +'/lifecycle/deactivate';
+
+	request(options, function (error, response, body) {
+	  if (error) {
+	  	throw new Error(error);
+	  	res.json({error: error});
+	  } else {
+	  	res.json({status: 'SUCCESS'})
+	  }
+	});
+};
+
 module.exports.enrollMFAs = (req, res, body) => { 
 
 	req.session.userId = body._embedded.user.id;
@@ -46,7 +88,7 @@ module.exports.enrollMFAs = (req, res, body) => {
 module.exports.newUser = (req, res) => {
 
 	options.url = oktaUrl + '/api/v1/users';
-	options.qs = { activate: 'true' },
+	options.qs = { activate: true },
 	options.body = { 
 		profile: { 
 			firstName: 			req.body.firstName,
@@ -88,7 +130,6 @@ module.exports.activateUser = (req, res) => {
 	  	res.json({status: 'SUCCESS'})
 	  }
 	});
-
 };
  
 module.exports.updateUser = (req, res) => {

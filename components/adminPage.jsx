@@ -34,6 +34,9 @@ class AdminPage extends React.Component {
 		this.suspendUser 				= this.suspendUser.bind(this);
 		this.unsuspendUser			= this.unsuspendUser.bind(this);
 		this.activateUser				= this.activateUser.bind(this);
+		this.deactivateUser			= this.deactivateUser.bind(this);
+		this.reactivateUser			= this.reactivateUser.bind(this);
+		this.unlockUser					= this.unlockUser.bind(this);
 		this.passwordExpire  		= this.passwordExpire.bind(this);
 
 		// user actions
@@ -43,10 +46,41 @@ class AdminPage extends React.Component {
 
 	}
 
+	unlockUser (e) {
+		e.stopPropagation();		
+		axios.post('/api/unlockUser', {userId: this.state.selectedUser.id})
+		.then(response=> {
+			if (response.data.status === 'SUCCESS'){
+					this.initializeState();
+			}
+		});
+	}
+
+	reactivateUser (e) {
+		e.stopPropagation();		
+		axios.post('/api/reactivateUser', {userId: this.state.selectedUser.id})
+		.then(response=> {
+			if (response.data.status === 'SUCCESS'){
+					this.initializeState();
+			}
+		});
+	}
+
+
+	deactivateUser (e) {
+		e.stopPropagation();		
+		axios.post('/api/deactivateUser', {userId: this.state.selectedUser.id})
+		.then(response=> {
+			if (response.data.status === 'SUCCESS'){
+					this.initializeState();
+			}
+		});
+	}
+
 	activateUser (e) {
 		e.stopPropagation();
 		axios.post('/api/activateUser', {userId: this.state.selectedUser.id})
-		.then(response=>{
+		.then(response=> {
 			if (response.data.status === 'SUCCESS'){
 					this.initializeState();
 			}
@@ -175,7 +209,7 @@ class AdminPage extends React.Component {
 				name: "STAGED", 
 				count: 0 
 			},{ 
-				name: "LOCKED", 
+				name: "LOCKED_OUT", 
 				count: 0 
 			},{ 
 				name: "SUSPENDED",
@@ -197,8 +231,6 @@ class AdminPage extends React.Component {
 	}
 
 	initializeState () {
-	
-	console.log('in initializeState');
 
 		axios.get('/api/getUsers')
 		.then(response => {
@@ -233,7 +265,6 @@ class AdminPage extends React.Component {
 	render() {
 
 		var selected = this.state.selected;
-		//console.log('selected List', this.state.selected);
 		
 		if (this.state.createUserLink) {
 			 return (<Redirect to='/createUser' />);
@@ -281,28 +312,43 @@ class AdminPage extends React.Component {
 
     <DropdownButton bsStyle={"primary"} title={"User Actions"} id={"1"}>
       <MenuItem onClick={this.createUser}>Create User</MenuItem>
-      { this.state.selectedUser &&
+      { this.state.selectedUser !== '' &&
       <MenuItem onClick={this.updateUser}>Update User</MenuItem>}
-      { this.state.selectedUser &&
+      { this.state.selectedUser !== '' &&
       <MenuItem onClick={this.deleteUser}>Delete User</MenuItem>}
     </DropdownButton>
 		
 		{ this.state.selectedUser &&			
     <DropdownButton bsStyle={"primary"} title={"Lifecycle Actions"} id={"2"}>
     
+    	{ this.state.selectedUser.status ==='PROVISIONED' && 
+    		<MenuItem onClick={this.reactivateUser}>Rectivate User</MenuItem> }
+
 	    { this.state.selectedUser.status ==='STAGED' &&
-	      <MenuItem onClick={this.activateUser}>Activate User</MenuItem>}
-	      <MenuItem onClick={this.updateUser}>Deactivate User</MenuItem>
+	      <MenuItem onClick={this.activateUser}>Activate User</MenuItem> }
+
+	    {  this.state.selectedUser.status !== 'DEPROVISIONED' &&
+	      <MenuItem onClick={this.deactivateUser}>Deactivate User</MenuItem> }
+
 	    { this.state.selectedUser.status === 'LOCKED_OUT' &&
 	      <MenuItem onClick={this.unlockUser}>Unlock User</MenuItem>} 
+	  
 	    {  this.state.selectedUser.status !== 'PASSWORD_EXPIRED' &&
 	      <MenuItem onClick={this.passwordExpire}>Expire Password</MenuItem>}
+	  
 	    {  this.state.selectedUser.status === 'RECOVERY' &&
 	      <MenuItem onClick={this.resetUser}>Reset User</MenuItem>}
+	    
 	    { this.state.selectedUser.status ==='ACTIVE' &&
 	      <MenuItem onClick={this.suspendUser}>Suspend User</MenuItem>}
+
 	    { this.state.selectedUser.status ==='SUSPENDED' &&
-	      <MenuItem onClick={this.unsuspendUser}>Unsuspend User</MenuItem>}
+	      	<MenuItem onClick={this.unsuspendUser}>Unsuspend User</MenuItem>}
+
+	    {  this.state.selectedUser.status ==='SUSPENDED' &&	
+	     		<MenuItem onClick={this.deactivateUser}>Deactivate User</MenuItem>}
+    
+
     </DropdownButton> }
 
     {!this.state.selectedUser && 
@@ -313,7 +359,6 @@ class AdminPage extends React.Component {
 
 				<div className="user-manager">
 					<div className="status-filter">
-					<div className="filterLabel"> Filters</div>
 						<ul className="status-list col-md-3">
 							{lifecycleStages.map(stage => {
 								if (this.state.currentlySelectedStage === stage.name) {
@@ -332,7 +377,7 @@ class AdminPage extends React.Component {
 					<div className="user-list col-md-9">
       				<div className="panel panel-default">
         				<div className="panel-heading">
-          				<h4>Fixed Header Scrolling Table</h4>
+          				<h4>Selected Users</h4>
         				</div>
 						<table className="table table-striped ">
 
@@ -347,7 +392,11 @@ class AdminPage extends React.Component {
 							<tbody>
 							{
 								selected.map(user => {
-									return (<AdminTableRow user={user} selected={this.state.selectedUser} 
+									var selected = false;
+									if (user.id === this.state.selectedUser.id) {
+										selected = true
+									}
+									return (<AdminTableRow user={user} selected={selected} 
 														key={user.id} selectUser={this.selectUser.bind(this, user)}/>)
 								})}
 							</tbody>
