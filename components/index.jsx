@@ -8,7 +8,6 @@ import LoginPage from './loginPage.jsx';
 import CreateUser from './createUser.jsx';
 import UpdateUser from './updateUser.jsx';
 import { BrowserRouter, Route, Link } from 'react-router-dom';
-import App from './app.jsx';
 
 
 ReactDOM.render(
@@ -19,6 +18,7 @@ ReactDOM.render(
       <Route path='/admin' component={AdminPage} />
       <Route path='/createUser' component={CreateUser} />
       <Route path='/updateUser/:userId' component={UpdateUser} />
+
     </div>
   </BrowserRouter>
 , document.getElementById('root'));

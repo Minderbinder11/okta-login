@@ -9,7 +9,7 @@
     "build": "npm run clean && npm run build-server",
     "start": "nodemon server/server.js --exec babel-node --presets es2015",
     "start-webpack": "webpack --config webpack.config.js --progress --colors --watch",
-    "start-prod": "node ./build/server.js"
+    "start-prod": "NODE_ENV=production node ./build/server.js"
   },
   "keywords": [],
   "author": "",
@@ -41,8 +41,8 @@
   },
   "babel": {
     "presets": [
-      "es2015",
-      "react"
+      "react",
+      "es2015"
     ]
   }
 }

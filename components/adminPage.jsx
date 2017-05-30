@@ -359,6 +359,7 @@ class AdminPage extends React.Component {
 
 				<div className="user-manager">
 					<div className="status-filter">
+					<div className="filterLabel"> Filters</div>
 						<ul className="status-list col-md-3">
 							{lifecycleStages.map(stage => {
 								if (this.state.currentlySelectedStage === stage.name) {
