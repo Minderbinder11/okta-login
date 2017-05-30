@@ -17,12 +17,9 @@ module.exports = (req, res, sessionToken ) => {
   };
 
   function callback(error, response, body) {
-
-    console.log('in sessions callback');
     if (!error) {
         body = JSON.parse(body);
          req.session.sessionId = body.id;
-         console.log('set session: ', req.session.sessionId);
          
     } else {
       console.log('error: ', error);

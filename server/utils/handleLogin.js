@@ -28,17 +28,13 @@ module.exports = ( req, res ) => {
 
 	request(options, (error, response, body) => {
 
-		console.log('handle login body', body);
 		if(error) {
 			throw new Error(error);
 			res.json({error: error});
-
 		} else if (body.status === 'SUCCESS') {
-
 	  	req.session.userId = body._embedded.user.id;
 	  	req.session.sessionToken = body.sessionToken;
 			getActions.getMFAs(req, res);
-
 		} else if (body.status === 'MFA_ENROLL'){
 			postActions.enrollMFAs(req, res, body);
 		} else {

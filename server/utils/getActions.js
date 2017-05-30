@@ -69,13 +69,9 @@ module.exports.getUsers = (req, res) => {
 
 module.exports.getMFAs = (req, res) => {
 
-	console.log('in get mfas');
-
   options.url = oktaUrl + '/api/v1/users/'+ req.session.userId +'/factors';
  
   request(options, (error, response, body) => {
-  	console.log('mfsa body', body);
-
     if (error) {
 	  	throw new Error(error);    	
       res.json({error: true});
@@ -87,8 +83,6 @@ module.exports.getMFAs = (req, res) => {
         var googleAuthenticator = body.filter(factor => {
         		return	(factor.factorType === "token:software:totp" && factor.provider === 'GOOGLE')});
         var factorId = googleAuthenticator[0].id;
-
-        console.log('in success')
         req.session.factorId = factorId;
         res.json({
           success: 'SUCCESS',
@@ -99,7 +93,6 @@ module.exports.getMFAs = (req, res) => {
     }
   });
 };
-
 
 // use this to find the admin users
 module.exports.getGroups = (req, res) => {

@@ -112,7 +112,6 @@ module.exports.newUser = (req, res) => {
 	  	res.json({error: error})
 	  } else {
 	  	res.json({status: 'SUCCESS'});
-	  	console.log(body);
 	  }
 	});
 };
@@ -190,7 +189,7 @@ module.exports.suspendUser = (req, res) => {
 // check on the userID field,  shouldnt this come from req.body.userId?
 module.exports.passwordReset = (req, res, userId) => {
 
-  options.url = oktaUrl + '/api/v1/users/'+ userId +'/lifecycle/reset_password';
+  options.url = oktaUrl + '/api/v1/users/' + userId + '/lifecycle/reset_password';
   options.qs = { sendEmail: 'true' };
 
   request(options, (error, response, body) => {
@@ -210,7 +209,7 @@ module.exports.passwordReset = (req, res, userId) => {
 
 module.exports.passwordExpire = (req, res ) => {
 
-  options.url = oktaUrl + '/api/v1/users/'+ req.body.userId +'/lifecycle/expire_password';
+  options.url = oktaUrl + '/api/v1/users/' + req.body.userId + '/lifecycle/expire_password';
   options.qs = { tempPassword: false };
 
   request(options, (error, response, body) => {

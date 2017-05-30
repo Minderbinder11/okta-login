@@ -1,5 +1,7 @@
 # .gitignore
 
+.DS_Store
+
 node_modules/
 client/dist/bundle.js
 client/dist/serveme.js
@@ -7,3 +9,5 @@ client/dist/serveme.js
 config.json
 
 build/*
+
+okta-login.pem
