@@ -19,6 +19,7 @@ import postActions from './utils/postActions';
 const port = process.env.port || 8000;
 
 const app = express();
+app.set('host', process.env.HOST || '127.0.0.1');
 
 app.use(cookieParser());
 app.use(session({

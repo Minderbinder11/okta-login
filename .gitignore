@@ -1,6 +1,6 @@
 # .gitignore
 
-.DS_Store
+.D*
 
 node_modules/
 client/dist/bundle.js
