@@ -1,6 +1,6 @@
 # .gitignore
 
-.D*
+.DS_Store
 
 node_modules/
 client/dist/bundle.js
@@ -11,3 +11,4 @@ config.json
 build/*
 
 okta-login.pem
+okta-login-desktop.pem
