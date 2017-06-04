@@ -67,14 +67,10 @@ app.get('/isAuth', ( req, res ) => {
 		}
 	});
 
-	app.post('/mfaactivate', (req, res) => { activateMFAs(req, res); });
-
-	// client sends MFA back to server for validation
-	app.post('/mfa', (req, res) => { validateMFAs(req, res); });
-
-// check on this to see if this should be a post
-// this is for login
-app.get('/passwordreset', (req, res) => { getActions.passwordReset(req, res); });
+	app.post('/register', 		(req, res) => { postActions.newUser(req, res); });
+	app.post('/mfaactivate', 	(req, res) => { activateMFAs(req, res); });
+	app.post('/mfa', 					(req, res) => { validateMFAs(req, res); });
+	app.get('/passwordreset', (req, res) => { getActions.passwordReset(req, res); });
 
 /*
  * API POST ACTIONS
@@ -92,9 +88,9 @@ app.get('/passwordreset', (req, res) => { getActions.passwordReset(req, res); })
 /*
  * API GET ACTIONS
  */
-	app.get('/api/applinks', (req, res) => { getActions.getApps(req, res); });
-	app.get('/api/groups', (req, res) => { getActions.getGroups(req, res); });
-	app.get('/api/getUsers', (req, res) => { getActions.getUsers(req, res); });
+	app.get('/api/applinks', 				(req, res) => { getActions.getApps(req, res); });
+	app.get('/api/groups', 					(req, res) => { getActions.getGroups(req, res); });
+	app.get('/api/getUsers', 				(req, res) => { getActions.getUsers(req, res); });
 	app.get('/api/getUser/:userId', (req, res) => { getActions.getAUser(req,res); });
 
 /*

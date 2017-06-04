@@ -125,6 +125,8 @@ module.exports.getGroups = (req, res) => {
 
 module.exports.passwordReset = (req, res) => {
 
+
+
  options.url = oktaUrl + '/api/v1/users';
  options.qs = { q: req.query.email };
 
@@ -132,9 +134,17 @@ request(options, function (error, response, body) {
   if (error) throw new Error(error);
 
   body = JSON.parse(body);
+	//console.log('get password reset', body);
 	var userId = body[0].id;
 
-	postActions.passwordReset(req, res, userId);
+	if (body[0].profile.email === req.query.email) {
+		postActions.passwordReset(req, res, userId);
+	} else {
+		res.json({status: 'NO_USERID'})
+	}
+
+
+	
 	});
 };
 

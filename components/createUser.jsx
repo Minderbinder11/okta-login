@@ -72,7 +72,8 @@ class CreateUser extends React.Component {
 	}
 
 	usernameChange (e) {
-		e.stopPropagation();		
+		e.stopPropagation();
+		e.preventDefault();		
 		this.setState({username: e.target.value});
 	}
 
@@ -181,7 +182,6 @@ class CreateUser extends React.Component {
 			<label>City</label>
 			<input type="text" id="city" className="form-control" value={this.state.city} 
 							onChange={this.cityChange} required></input>
-
 
 			<label>State</label>
 			<input type="text" id="state" className="form-control" value={this.state.state} 

@@ -16,6 +16,11 @@ var options = {
    } 
  };
 
+module.exports.register = (req, res) => {
+
+
+};
+
 module.exports.unlockUser = (req, res) => {
 	options.url = oktaUrl + '/api/v1/users/'+ req.body.userId +'/lifecycle/unlock';
 
@@ -87,6 +92,8 @@ module.exports.enrollMFAs = (req, res, body) => {
 
 module.exports.newUser = (req, res) => {
 
+	console.log(req.body);
+
 	options.url = oktaUrl + '/api/v1/users';
 	options.qs = { activate: true },
 	options.body = { 
@@ -109,9 +116,11 @@ module.exports.newUser = (req, res) => {
 	request(options, function (error, response, body) {
 	  if (error) {
 	  	throw new Error(error);
-	  	res.json({error: error})
+	  	res.json({error: error});
+	  	console.log(error);
 	  } else {
 	  	res.json({status: 'SUCCESS'});
+	  	console.log('success: ', body)
 	  }
 	});
 };
@@ -187,7 +196,7 @@ module.exports.suspendUser = (req, res) => {
 
 
 // check on the userID field,  shouldnt this come from req.body.userId?
-module.exports.passwordReset = (req, res, userId) => {
+module.exports.passwordReset = (req, res, userId) => {  
 
   options.url = oktaUrl + '/api/v1/users/' + userId + '/lifecycle/reset_password';
   options.qs = { sendEmail: 'true' };
@@ -195,7 +204,10 @@ module.exports.passwordReset = (req, res, userId) => {
   request(options, (error, response, body) => {
     if (error) {
       throw new Error(error);
-      res.json({error: error});
+      res.json({
+      	status: 'ERROR',
+      	error: error
+      });
     } else {
       res.json({
         status: 'SUCCESS',

@@ -7,6 +7,7 @@ import AdminPage from './adminPage.jsx';
 import LoginPage from './loginPage.jsx';
 import CreateUser from './createUser.jsx';
 import UpdateUser from './updateUser.jsx';
+import RegistrationPage from './registrationPage.jsx'
 import { BrowserRouter, Route, Link } from 'react-router-dom';
 
 
@@ -18,7 +19,7 @@ ReactDOM.render(
       <Route path='/admin' component={AdminPage} />
       <Route path='/createUser' component={CreateUser} />
       <Route path='/updateUser/:userId' component={UpdateUser} />
-
+      <Route path='/signup' component={RegistrationPage} />
     </div>
   </BrowserRouter>
 , document.getElementById('root'));
