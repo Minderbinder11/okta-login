@@ -1,6 +1,3 @@
-
-// getAUser.js
-
 import request from 'request';
 import postActions from './postActions';
 import config from '../../config.json';
@@ -20,13 +17,14 @@ var options = {
 
 module.exports.getAUser = (req, res) => { 
 
-	options.url = oktaUrl + '/api/v1/users/' + req.params.userId,
+	options.url = oktaUrl + '/api/v1/users/' + req.session.userId,
 
 	request(options, (error, response, body) => {
 	  if (error) {
 	  	throw new Error(error);
 	  	res.json({error: error})
 	  } else {
+	  	body = JSON.parse(body);
 			res.json({
 				status: 'SUCCESS',
 				user: body, 

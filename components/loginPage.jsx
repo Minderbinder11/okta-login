@@ -133,9 +133,8 @@ class LoginPage extends React.Component {
 				this.setState({
 					mfaError: true,
 					mfacode: ''
-					});
+				});
 			}
-		
 		})
 		.catch( err => {
 			console.log(err);
@@ -208,14 +207,15 @@ class LoginPage extends React.Component {
             <button className="btn btn-lg btn-primary btn-block btn-signin" type="submit" 
             				onClick={this.handleSubmit}>Sign in</button>
         	</div>
+        	<div className="login-help">
             <a href="#" className="forgot-password" onClick={this.resetPassword}>
                 Forgot the password?
             </a>
 
-            <a href="#" className="forgot-password" onClick={this.register} >
+            <a href="#" className="forgot-password pull-right" onClick={this.register} >
                 Sign Up
             </a>
-
+           </div>
 	          {this.state.mfaEnroll && <div>
 						Follow link to Active Google Authenticate MFA
 						<a href={this.state.mfaEnrollLink} target="blank" onClick={this.hanldeActivateMFA}>Activate</a>

@@ -92,6 +92,7 @@ app.get('/isAuth', ( req, res ) => {
 	app.get('/api/groups', 					(req, res) => { getActions.getGroups(req, res); });
 	app.get('/api/getUsers', 				(req, res) => { getActions.getUsers(req, res); });
 	app.get('/api/getUser/:userId', (req, res) => { getActions.getAUser(req,res); });
+	app.get('/api/getCurrentUser', 	(req, res) => {	getActions.getAUser(req, res)});
 
 /*
  * API PUT ACTIONS
