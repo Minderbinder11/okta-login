@@ -18,7 +18,41 @@ var options = {
 
 module.exports.register = (req, res) => {
 
+	var getoptions = {
+		method: 'GET',
+		headers: 
+	   { 'cache-control': 'no-cache',
+			 'authorization': 'SSWS '+ apiKey,
+	     'content-type': 'application/json',
+	     'accept': 'application/json' }
 
+	};
+
+	getoptions.url = oktaUrl + '/api/v1/users?q=' + req.body.email
+
+	 request (getoptions, (error, response, body) => {
+
+	 		var userFound = false;
+		 	if (error) {
+		 		throw new Error(error);
+		 	}
+		 	body = JSON.parse(body);
+
+		 for (var i = 0; i < body.length; i++) {	
+		 		
+		 		if (body[i].profile !== undefined) {
+		 			if (body[i].profile.email === req.body.email) {
+						res.json({status: 'USER_EXISTS'});
+						userFound = true; 
+		 			} 
+		 		}
+		 }
+		 	
+		 if (! userFound)	{
+			newUser(req, res);
+		 }
+
+	 });
 };
 
 module.exports.unlockUser = (req, res) => {
@@ -90,9 +124,7 @@ module.exports.enrollMFAs = (req, res, body) => {
 };
 
 
-module.exports.newUser = (req, res) => {
-
-	console.log(req.body);
+function newUser (req, res) {
 
 	options.url = oktaUrl + '/api/v1/users';
 	options.qs = { activate: true },
@@ -106,10 +138,7 @@ module.exports.newUser = (req, res) => {
       city: 					req.body.city,
       state: 					req.body.state,
       zipCode: 				req.body.zip
-     },
-    credentials: { 
-     	password: { value: req.body.password } 
-     	}	 
+     } 
    	};
 	options.json =  true ;
 
@@ -117,13 +146,26 @@ module.exports.newUser = (req, res) => {
 	  if (error) {
 	  	throw new Error(error);
 	  	res.json({error: error});
-	  	console.log(error);
 	  } else {
-	  	res.json({status: 'SUCCESS'});
-	  	console.log('success: ', body)
+	  	console.log('in new user', body);
+
+	  		options.url = oktaUrl + '/api/v1/users/'+ body.id +'/lifecycle/activate';
+  			options.qs = { sendEmail: true };
+  			options.body = {};
+
+				request(options, function (error, response, body) {
+	  			if (error) {
+	  				throw new Error(error);
+	  				res.json({error: error});
+	  			} else {
+	  				res.json({status: 'SUCCESS'})
+	  			}
+				});
 	  }
 	});
 };
+
+module.exports.newUser = newUser;
 
 module.exports.activateUser = (req, res) => {
 
@@ -162,7 +204,6 @@ module.exports.updateUser = (req, res) => {
 
 };
 
-
 module.exports.unsuspendUser = (req, res) => { 
 
 	options.url = oktaUrl + '/api/v1/users/'+ req.body.userId +'/lifecycle/unsuspend';
@@ -178,7 +219,6 @@ module.exports.unsuspendUser = (req, res) => {
 	
 };
 
-
 module.exports.suspendUser = (req, res) => {
 
 	options.url = oktaUrl + '/api/v1/users/'+ req.body.userId +'/lifecycle/suspend';
@@ -193,7 +233,6 @@ module.exports.suspendUser = (req, res) => {
 	});
 
 };
-
 
 // check on the userID field,  shouldnt this come from req.body.userId?
 module.exports.passwordReset = (req, res, userId) => {  

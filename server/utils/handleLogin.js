@@ -28,6 +28,8 @@ module.exports = ( req, res ) => {
 
 	request(options, (error, response, body) => {
 
+		console.log('in handle login: ', body)
+
 		if(error) {
 			throw new Error(error);
 			res.json({error: error});

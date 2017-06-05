@@ -5,8 +5,6 @@ import axios from 'axios';
 import { Redirect } from 'react-router';
 import HomePage from './homePage.jsx';
 
-// PROBLEM OF SIGNING IN AND THE HITTING REFRESH AND HAVING IT GO TO THE LOGIN PAGE
-
 
 class LoginPage extends React.Component {
 
@@ -24,7 +22,7 @@ class LoginPage extends React.Component {
 			mfaEnrollLink: '',
 			mfaActivate: false,
 			resetPassordError: false,
-			passwordResetSuccess: true,
+			passwordResetSuccess: false,
 			register: false
 		};
 		this.handleUsernameChange 	= this.handleUsernameChange.bind(this);
@@ -47,10 +45,10 @@ class LoginPage extends React.Component {
 		});
 	}
 
-	register (e) 							{ this.setState({register: true}); }
-	handleUsernameChange (e) 	{ this.setState({ username: e.target.value }); }
-	handlePasswordChange (e) 	{ this.setState({ password: e.target.value }); }
-	handleMFAChange (e) 			{ this.setState({ mfacode: 	e.target.value}); }
+	register (e) 							{ e.preventDefault(); this.setState({ register: true}); }
+	handleUsernameChange (e) 	{ e.preventDefault(); this.setState({ username: e.target.value }); }
+	handlePasswordChange (e) 	{ e.preventDefault(); this.setState({ password: e.target.value }); }
+	handleMFAChange (e) 			{ e.preventDefault(); this.setState({ mfacode: 	e.target.value}); }
 
 	
 	handleMFAActivateCode () {
@@ -95,6 +93,7 @@ class LoginPage extends React.Component {
 		.then(response => {
 
 			if (response.data.error) {
+				console.log('error')
 				this.setState({
 					showLoginError: true,
 					username: '',

@@ -1,17 +1,17 @@
 // server.js
-import path 				 from 'path';
-import express 			 from 'express';
-import request 			 from 'request';
-import bodyParser 	 from 'body-parser';
-import session 			 from 'express-session';
-import cookieParser  from 'cookie-parser';
-import setSession 	 from './utils/setSession';
-import handleLogin	 from './utils/handleLogin';
-import validateMFAs	 from './utils/validateMFAs';
-import activateMFAs  from './utils/activateMFAs';
-import deleteUser 	 from './utils/deleteUser';
+import path 				 	from 'path';
+import express 			 	from 'express';
+import request 			 	from 'request';
+import bodyParser 	 	from 'body-parser';
+import session 			 	from 'express-session';
+import cookieParser  	from 'cookie-parser';
+import setSession 	 	from './utils/setSession';
+import handleLogin	 	from './utils/handleLogin';
+import validateMFAs	 	from './utils/validateMFAs';
+import activateMFAs  	from './utils/activateMFAs';
+import deleteUser 	 	from './utils/deleteUser';
 import getActions			from './utils/getActions';
-import postActions from './utils/postActions';
+import postActions 		from './utils/postActions';
 
 
 //import middlewareActiveSession from './utils/middlewareActiveSession';
@@ -67,7 +67,7 @@ app.get('/isAuth', ( req, res ) => {
 		}
 	});
 
-	app.post('/register', 		(req, res) => { postActions.newUser(req, res); });
+	app.post('/register', 		(req, res) => { postActions.register(req, res); });
 	app.post('/mfaactivate', 	(req, res) => { activateMFAs(req, res); });
 	app.post('/mfa', 					(req, res) => { validateMFAs(req, res); });
 	app.get('/passwordreset', (req, res) => { getActions.passwordReset(req, res); });

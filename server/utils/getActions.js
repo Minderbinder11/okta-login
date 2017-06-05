@@ -35,6 +35,7 @@ module.exports.getAUser = (req, res) => {
 	});
 };
 
+
 module.exports.getApps = (req, res) => { 
 
 	options.url = oktaUrl + '/api/v1/users/' + req.session.userId + '/appLinks'
