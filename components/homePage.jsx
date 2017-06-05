@@ -27,20 +27,16 @@ class HomePage extends React.Component {
 
     axios.get('/api/getCurrentUser')
     .then( response => {
-      // var info = JSON.parse(response);
-      console.log('User Data: ', response)
       this.setState({
         firstName:  response.data.user.profile.firstName,
         lastName:   response.data.user.profile.lastName,
         login:      response.data.user.profile.login
       });
-
     });
 
     axios.get('/api/applinks')
     .then(response => {
-
-      console.log(response);
+      console.log('apps: ', response.data);
       this.setState({apps: response.data})
     });
 
@@ -65,7 +61,6 @@ class HomePage extends React.Component {
     e.stopPropagation();
     axios.get('/logout')
     .then(response => {
-      //console.log('in logout promise')
       this.setState({loggedIn: false});
     });
   }
@@ -88,7 +83,7 @@ class HomePage extends React.Component {
                   <button type="button" className="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
                     <span className="sr-only">Toggle navigation</span>
                     <span className="icon-bar"></span>
-                    { this.state.admin && <span className="icon-bar"></span> }
+                    { this.state.isAdmin && <span className="icon-bar"></span> }
                     <span className="icon-bar"></span>
                   </button>
                   <a className="navbar-brand" href="">
@@ -99,7 +94,7 @@ class HomePage extends React.Component {
                   <ul className="nav navbar-nav">
                     <li className="active"><a href="#">Home<span className="sr-only">(current)</span></a></li>
                     <li><a href="#">Applications</a></li>
-                    { this.state.admin && <li><a href="#" onClick={this.adminRedirect}>Admin</a></li> }
+                    { this.state.isAdmin && <li><a href="#" onClick={this.adminRedirect}>Admin</a></li> }
                     <li><a href="#" onClick={this.handleLogOut}>Logout</a></li>                 
                   </ul>
                 </div>

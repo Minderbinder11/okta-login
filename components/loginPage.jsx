@@ -18,9 +18,7 @@ class LoginPage extends React.Component {
 			mfacode: '',
 			mfaError: false,
 			isAuth: false,
-			mfaEnroll: false,
 			mfaEnrollLink: '',
-			mfaActivate: false,
 			resetPassordError: false,
 			passwordResetSuccess: false,
 			register: false
@@ -30,8 +28,6 @@ class LoginPage extends React.Component {
 		this.handleSubmit 					= this.handleSubmit.bind(this);
 		this.handleMFASubmit 				= this.handleMFASubmit.bind(this);
 		this.handleMFAChange 				= this.handleMFAChange.bind(this);
-		this.hanldeActivateMFA			= this.hanldeActivateMFA.bind(this);
-		this.handleMFAActivateCode	= this.handleMFAActivateCode.bind(this);
 		this.resetPassword 					= this.resetPassword.bind(this);
 		this.register								= this.register.bind(this);
 	}
@@ -50,41 +46,6 @@ class LoginPage extends React.Component {
 	handlePasswordChange (e) 	{ e.preventDefault(); this.setState({ password: e.target.value }); }
 	handleMFAChange (e) 			{ e.preventDefault(); this.setState({ mfacode: 	e.target.value}); }
 
-	
-	handleMFAActivateCode () {
-
-	 	this.setState({
-	 		mfacode: '',
-	 		mfaActivate: false
-	 		});
-
-	 	axios.post('/mfaactivate', {mfacode: this.state.mfacode})
-	 	.then(response => {
-
-	 		if(response.data.status === 'SUCCESS') {
-	 			this.setState({
-	 				showMFA: true,
-	 				mfaActivate: false,
-	 				mfacode: ''
-	 			});
-	 		} else {
-	 			this.setState({
-	 				mfaactivate: false,
-	 				showLoginError: true
-	 			});
-	 		}
-	 	});
-
-	 }
-
-	hanldeActivateMFA () {
-		this.setState({
-			mfaEnroll: false,
-			mfaEnrollLink: '',
-			mfaActivate: true
-		});
-	}
-
 	handleSubmit () {
 
 		axios.post('/login', {
@@ -101,14 +62,11 @@ class LoginPage extends React.Component {
 				});
 			} else if (response.data.status === 'AUTHENTICATED') {
 				 this.setState({isAuth: true})
-
 			} else if (response.data.status === 'ENROLL'){
-
 				this.setState({
 					mfaEnroll: true,
 					mfaEnrollLink: response.data.href
 				});
-
 			} else {
 				this.setState({showMFA: true});		
 			}
@@ -127,9 +85,7 @@ class LoginPage extends React.Component {
 			if (response.data.factorResult === 'SUCCESS') {
 				this.setState({showMFA: false});
 				this.setState({isAuth: true});
-
 			} else {
-				// show an error message
 				this.setState({
 					mfaError: true,
 					mfacode: ''
@@ -177,7 +133,7 @@ class LoginPage extends React.Component {
 				</div>}
 
 				{this.state.resetPassordError && <div className="alert alert-danger login-message successfully-saved" role="alert"> 
-					Incorrect Username
+					No user with the login ID.
 				</div>}
 
 				{this.state.passwordResetSuccess && <div className="alert alert-danger login-message successfully-saved" role="alert"> 
@@ -216,19 +172,6 @@ class LoginPage extends React.Component {
                 Sign Up
             </a>
            </div>
-	          {this.state.mfaEnroll && <div>
-						Follow link to Active Google Authenticate MFA
-						<a href={this.state.mfaEnrollLink} target="blank" onClick={this.hanldeActivateMFA}>Activate</a>
-						</div>}
-
-					{this.state.mfaActivate && <div className="alert alert-info login-message">
-							<input 	type="text" className="form-control input-margin" placeholder="Google Authenticator Code"
-											value={this.state.mfacode} onChange={this.handleMFAChange}></input>
-											<div className="spacer"></div>
-							<button 
-											className="btn btn-lg btn-primary btn-block btn-signin"
-											onClick={this.handleMFAActivateCode}>Send MFA</button>
-					</div>}
 
 					{this.state.showMFA && <div>
 							<input 	type="text" className="form-control input-margin" placeholder="Google Authenticator Code"

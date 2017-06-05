@@ -12,10 +12,10 @@ class AppLink extends React.Component {
 	render() {
 
 		return (
-			<li className="user-apps">
-        <a href={this.props.app.linkUrl} target="blank">
-          <img src={this.props.app.logoUrl}/>
-        </a>
+			<li className="user-apps">	
+					<div className="app-tile row text-centered">
+          	<img className="center-block" src={this.props.app.logoUrl}/>
+        	</div>
       </li>
 			);
 	}

@@ -68,7 +68,6 @@ app.get('/isAuth', ( req, res ) => {
 	});
 
 	app.post('/register', 		(req, res) => { postActions.register(req, res); });
-	app.post('/mfaactivate', 	(req, res) => { activateMFAs(req, res); });
 	app.post('/mfa', 					(req, res) => { validateMFAs(req, res); });
 	app.get('/passwordreset', (req, res) => { getActions.passwordReset(req, res); });
 
