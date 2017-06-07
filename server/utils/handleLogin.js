@@ -31,7 +31,8 @@ module.exports = ( req, res ) => {
 		console.log('in handle login: ', body)
 
 		if(error) {
-			throw new Error(error);
+			console.log(error)
+			//throw new Error(error);
 			res.json({error: error});
 		} else if (body.status === 'SUCCESS') {
 	  	req.session.userId = body._embedded.user.id;
