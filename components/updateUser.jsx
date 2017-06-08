@@ -36,8 +36,9 @@ class UpdateUser extends React.Component {
 
 		axios.get('/api/getUser/' + this.props.match.params.userId)
 		.then(response => {
+			console.log('response fro /api/getUsers', response);
 			var user = response.data.user;
-			user = JSON.parse(user);
+			// user = JSON.parse(user);
 			
 			this.setState({
 				userUpdated: 		false,

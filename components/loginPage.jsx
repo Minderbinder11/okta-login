@@ -140,7 +140,7 @@ class LoginPage extends React.Component {
 					A Password Reset Email Has Been Sent
 				</div>}
 
-	    <div className="container">
+	    <div className="container top-margin">
 	    	<nav className="navbar navbar-default">
 	    		<div className="navbar-header">
       			<a className="navbar-brand" href="#">
