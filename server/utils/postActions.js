@@ -16,6 +16,20 @@ var options = {
    } 
  };
 
+module.exports.deleteUser = (req, res) => { 
+
+	options.url = oktaUrl + '/api/v1/users/' + req.body.userId + '/lifecycle/deactivate';
+
+	request(options, (error, response, body) => {
+	  if (error) {
+	  	res.status(500).send(error);
+	  	return;
+	  } 
+	  res.json({status: 'SUCCESS'});
+	});
+};
+
+
 module.exports.validateMFAs = (req, res) => { 
 
 	options.url = oktaUrl + '/api/v1/users/' + req.session.userId + '/factors/' + req.session.factorId + '/verify';
@@ -92,9 +106,9 @@ module.exports.reactivateUser = (req, res) => {
 	request(options, function (error, response, body) {		
 	  if (error) {
 	  	res.status(500).send(error);
-	  } else {
-	  	res.json({status: 'SUCCESS'})
-	  }
+	  	return;
+	  } 
+	  res.json({status: 'SUCCESS'})
 	});
 };
 
@@ -105,9 +119,9 @@ module.exports.deactivateUser = (req, res) => {
 	request(options, function (error, response, body) {
 	  if (error) {
 	  	res.status(500).send(error);
-	  } else {
-	  	res.json({status: 'SUCCESS'})
+	  	return;
 	  }
+	  	res.json({status: 'SUCCESS'})
 	});
 };
 
@@ -123,16 +137,16 @@ module.exports.enrollMFAs = (req, res, body) => {
 	options.json= true;
 
 	request(options, (error, response, body) => {
-	  
 	  if (error) {
 	  	res.status(500).send(error); 	
-	  } else {
-		  req.session.factorId = body.id;
-		  res.json({
-		  	href: body._embedded.activation._links.qrcode.href,
-		  	status: 'ENROLL'
-		  });
-		}
+	  	return;
+	  } 
+	  req.session.factorId = body.id;
+	  res.json({
+	  	href: body._embedded.activation._links.qrcode.href,
+	  	status: 'ENROLL'
+	  });
+		
 	});
 };
 
@@ -158,21 +172,20 @@ function newUser (req, res) {
 	request(options, function (error, response, body) {
 	  if (error) {
 	  	res.status(500).send(error);
-	  } else {
+	  	return;
+	  } 
 
-	  		options.url = oktaUrl + '/api/v1/users/'+ body.id +'/lifecycle/activate';
-  			options.qs = { sendEmail: true };
-  			options.body = {};
+		options.url = oktaUrl + '/api/v1/users/'+ body.id +'/lifecycle/activate';
+		options.qs = { sendEmail: true };
+		options.body = {};
 
-				request(options, function (error, response, body) {
-	  			if (error) {
-	  				throw new Error(error);
-	  				res.json({error: error});
-	  			} else {
-	  				res.json({status: 'SUCCESS'})
-	  			}
-				});
-	  }
+		request(options, function (error, response, body) {
+			if (error) {
+		  	res.status(500).send(error);
+		  	return;
+			} 
+			res.json({status: 'SUCCESS'})
+		});
 	});
 };
 
@@ -186,9 +199,9 @@ module.exports.activateUser = (req, res) => {
 	request(options, function (error, response, body) {
 	  if (error) {
 	  	res.status(500).send(error);
-	  } else {
-	  	res.json({status: 'SUCCESS'})
+	  	return;
 	  }
+	  res.json({status: 'SUCCESS'})
 	});
 };
  
@@ -198,7 +211,6 @@ module.exports.updateUser = (req, res) => {
 	var obj = req.body;
 	delete obj.userId;
 
-
 	options.url = oktaUrl + '/api/v1/users/' + userId;
 	options.body = {profile: obj};
 	options.json = true;
@@ -206,9 +218,9 @@ module.exports.updateUser = (req, res) => {
 	request(options, (error, response, body) => {
 	  if (error) {
 	  	res.status(500).send(error);
-	  } else {
-	  	res.json({status: 'SUCCESS'});
-	  }
+	  	return;
+	  } 
+	  res.json({status: 'SUCCESS'});
 	});
 };
 
@@ -219,9 +231,9 @@ module.exports.unsuspendUser = (req, res) => {
 	request(options, (error, response, body) => {
 	  if (error) {
 	  	res.status(500).send(error);
-	  } else {
+	  	return;
+	  }
 	  res.json({status: 'SUCCESS'});
-		}
 	});
 };
 
@@ -232,9 +244,9 @@ module.exports.suspendUser = (req, res) => {
 	request(options, (error, response, body) => {
 	  if (error) {
 	  	res.status(500).send(error);
-	  } else {
+	  	return;
+	  } 
 	  res.json({status: 'SUCCESS'});
-		}
 	});
 
 };
@@ -248,12 +260,12 @@ module.exports.passwordReset = (req, res, userId) => {
   request(options, (error, response, body) => {
     if (error) {
 	  	res.status(500).send(error);
-    } else {
-      res.json({
-        status: 'SUCCESS',
-        link: body
-      });
+	  	return;
     }
+    res.json({
+      status: 'SUCCESS',
+      link: body
+    });
   });
 };
 
@@ -266,12 +278,12 @@ module.exports.passwordExpire = (req, res ) => {
   request(options, (error, response, body) => {
     if (error) {
 	  	res.status(500).send(error);
-    } else {
-      res.json({
-        status: 'SUCCESS',
-        link: body
-      });
+	  	return;
     }
+    res.json({
+      status: 'SUCCESS',
+      link: body
+    });
   });
 };
 

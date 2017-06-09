@@ -8,7 +8,6 @@ import cookieParser  	from 'cookie-parser';
 import setSession 	 	from './utils/setSession';
 import handleLogin	 	from './utils/handleLogin';
 import activateMFAs  	from './utils/activateMFAs';
-import deleteUser 	 	from './utils/deleteUser';
 import getActions			from './utils/getActions';
 import postActions 		from './utils/postActions';
 
@@ -31,7 +30,7 @@ app.use(session({
 app.use(express.static('client'));
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({ extended: false }));
 
 // middleware to ensure user is logged in by checking the req.session.userId
 
@@ -74,7 +73,7 @@ app.get('/isAuth', ( req, res ) => {
  * API POST ACTIONS
  */
 	app.post('/api/activateUser',		(req, res) => { postActions.activateUser(req, res); });
-	app.post('/api/deleteUser', 		(req, res) => { deleteUser(req, res); });
+	app.post('/api/deleteUser', 		(req, res) => { postActions.deleteUser(req, res); });
 	app.post('/api/unsuspendUser', 	(req, res) => { postActions.unsuspendUser(req, res); });
 	app.post('/api/suspendUser', 		(req, res) => { postActions.suspendUser(req, res); });
 	app.post('/api/newuser', 				(req, res) => { postActions.newUser(req, res); });
