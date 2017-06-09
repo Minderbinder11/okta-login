@@ -68,7 +68,7 @@ class RegistrationPage extends React.Component {
 						passwordError: true,
 						errorMessage: 'That email is already registered'
 						});
-					// take some action tp alert the uesre exists
+					
 				} else if (response.data.error) {
 					console.log(response.data.error);
 				}

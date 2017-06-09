@@ -24,7 +24,7 @@ module.exports.getAUser = (req, res) => {
 	  	res.status(500).send(error);
 	  } else {
 	  	body = JSON.parse(body);
-			res.json({
+			res.status(200).json({
 				status: 'SUCCESS',
 				user: body, 
 			})
@@ -42,7 +42,7 @@ module.exports.getUserById = (req, res) => {
 	  	res.status(500).send(error);
 	  } else {
 	  	body = JSON.parse(body);
-			res.json({
+			res.status(200).json({
 				status: 'SUCCESS',
 				user: body, 
 			})
@@ -59,7 +59,7 @@ module.exports.getApps = (req, res) => {
 	  	res.status(500).send(error);
 		} else {
 			body = JSON.parse(body);
-			res.json(body);
+			res.status(200).json(body);
 		}
 	});
 };
@@ -74,7 +74,7 @@ module.exports.getUsers = (req, res) => {
 	  	res.status(500).send(error);
 	  } else {
 	  	body = JSON.parse(body);
-	  	res.json({users: body});
+	  	res.status(200).json({users: body});
 	  }
 	});
 
@@ -93,7 +93,7 @@ module.exports.getMFAs = (req, res, userId) => {
     body = JSON.parse(body);
     
     if (body.length === 0) {
-      res.json({error: true});
+      res.status(200).json({error: true});
       return;
     } 
     
@@ -126,13 +126,13 @@ module.exports.getGroups = (req, res) => {
 		  	
 		  	if (group.profile.name === 'admin'){
 		  		req.session.isAdmin = true;
-		  		res.json({status: 'admin'});
+		  		res.status(200).json({status: 'admin'});
 		  	}
 		  });
 
 		  if (!req.session.isAdmin) {
 		  	req.session.isAdmin = false;
-		  	res.json({status: 'user'});
+		  	res.status(200).json({status: 'user'});
 		  }
 		}
 	});
@@ -154,7 +154,7 @@ module.exports.passwordReset = (req, res) => {
 		if (body[0].profile.email === req.query.email) {
 			postActions.passwordReset(req, res, userId);
 		} else {
-			res.json({status: 'NO_USERID'})
+			res.status(200).json({status: 'NO_USERID'})
 		}	
 	});
 };

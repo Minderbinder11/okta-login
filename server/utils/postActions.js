@@ -16,6 +16,21 @@ var options = {
    } 
  };
 
+module.exports.activateMFAs = (req, res) => { 
+
+	options.url 	= 'https://dev-477147.oktapreview.com/api/v1/users/'+ req.session.userId +'/factors/'+ req.session.factorId +'/lifecycle/activate';
+	options.body 	= { passCode: req.body.mfacode };
+  options.json 	= true;
+
+	request(options, function (error, response, body) {
+	  if (error) {
+	  	res.status(500).send(error);
+	  	return;
+	  }
+	  res.status(200).json({status: 'SUCCESS'});
+	});
+};
+
 module.exports.deleteUser = (req, res) => { 
 
 	options.url = oktaUrl + '/api/v1/users/' + req.body.userId + '/lifecycle/deactivate';
@@ -24,17 +39,17 @@ module.exports.deleteUser = (req, res) => {
 	  if (error) {
 	  	res.status(500).send(error);
 	  	return;
-	  } 
-	  res.json({status: 'SUCCESS'});
+	  }
+	  res.status(200).json({status: 'SUCCESS'});
 	});
 };
 
 
 module.exports.validateMFAs = (req, res) => { 
 
-	options.url = oktaUrl + '/api/v1/users/' + req.session.tempId + '/factors/' + req.session.factorId + '/verify';
-	options.body =  { passCode: req.body.mfacode};
-	options.json = true;
+	options.url 	= oktaUrl + '/api/v1/users/' + req.session.tempId + '/factors/' + req.session.factorId + '/verify';
+	options.body 	=  { passCode: req.body.mfacode};
+	options.json 	= true;
 
 	request(options, function (error, response, body) {
 	  if (error) {
@@ -48,7 +63,6 @@ module.exports.validateMFAs = (req, res) => {
 	  } else {
 	  	res.status(200).json({ error: 'ERROR' })
 	  }
-
 	});
 };
 
@@ -79,16 +93,14 @@ module.exports.register = (req, res) => {
 		 		
 		 		if (body[i].profile !== undefined) {
 		 			if (body[i].profile.email === req.body.email) {
-						res.json({status: 'USER_EXISTS'});
+						res.status(200).json({status: 'USER_EXISTS'});
 						userFound = true; 
 		 			} 
 		 		}
 		 }
-		 	
 		 if (! userFound)	{
 			newUser(req, res);
 		 }
-
 	 });
 };
 
@@ -100,7 +112,7 @@ module.exports.unlockUser = (req, res) => {
 	  	res.status(500).send(error);
 	  	return;
 	  }
-	  res.json({status: 'SUCCESS'})
+	  res.status(200).json({status: 'SUCCESS'})
 	  
 	});
 };
@@ -115,7 +127,7 @@ module.exports.reactivateUser = (req, res) => {
 	  	res.status(500).send(error);
 	  	return;
 	  } 
-	  res.json({status: 'SUCCESS'})
+	  res.status(200).json({status: 'SUCCESS'})
 	});
 };
 
@@ -128,7 +140,7 @@ module.exports.deactivateUser = (req, res) => {
 	  	res.status(500).send(error);
 	  	return;
 	  }
-	  	res.json({status: 'SUCCESS'})
+	  	res.status(200).json({status: 'SUCCESS'})
 	});
 };
 
@@ -136,12 +148,12 @@ module.exports.enrollMFAs = (req, res, body) => {
 
 	req.session.userId = body._embedded.user.id;
 
-	options.url = oktaUrl + '/api/v1/users/'+ body._embedded.user.id +'/factors',
-	options.body = { 
+	options.url 	= oktaUrl + '/api/v1/users/'+ body._embedded.user.id +'/factors',
+	options.body 	= { 
 		factorType: 'token:software:totp', 
 	  	provider: 'GOOGLE' 
 	  };
-	options.json= true;
+	options.json 	= true;
 
 	request(options, (error, response, body) => {
 	  if (error) {
@@ -149,7 +161,7 @@ module.exports.enrollMFAs = (req, res, body) => {
 	  	return;
 	  } 
 	  req.session.factorId = body.id;
-	  res.json({
+	  res.status(200).json({
 	  	href: body._embedded.activation._links.qrcode.href,
 	  	status: 'ENROLL'
 	  });
@@ -160,9 +172,9 @@ module.exports.enrollMFAs = (req, res, body) => {
 
 function newUser (req, res) {
 
-	options.url = oktaUrl + '/api/v1/users';
-	options.qs = { activate: true },
-	options.body = { 
+	options.url 	= oktaUrl + '/api/v1/users';
+	options.qs 		= { activate: true },
+	options.body 	= { 
 		profile: { 
 			firstName: 			req.body.firstName,
       lastName: 			req.body.lastName,
@@ -182,16 +194,16 @@ function newUser (req, res) {
 	  	return;
 	  } 
 
-		options.url = oktaUrl + '/api/v1/users/'+ body.id +'/lifecycle/activate';
-		options.qs = { sendEmail: true };
-		options.body = {};
+		options.url 	= oktaUrl + '/api/v1/users/'+ body.id +'/lifecycle/activate';
+		options.qs 		= { sendEmail: true };
+		options.body 	= {};
 
 		request(options, function (error, response, body) {
 			if (error) {
 		  	res.status(500).send(error);
 		  	return;
 			} 
-			res.json({status: 'SUCCESS'})
+			res.status(200).json({status: 'SUCCESS'})
 		});
 	});
 };
@@ -208,7 +220,7 @@ module.exports.activateUser = (req, res) => {
 	  	res.status(500).send(error);
 	  	return;
 	  }
-	  res.json({status: 'SUCCESS'})
+	  res.status(200).json({status: 'SUCCESS'})
 	});
 };
  
@@ -227,7 +239,7 @@ module.exports.updateUser = (req, res) => {
 	  	res.status(500).send(error);
 	  	return;
 	  } 
-	  res.json({status: 'SUCCESS'});
+	  res.status(200).json({status: 'SUCCESS'});
 	});
 };
 
@@ -240,7 +252,7 @@ module.exports.unsuspendUser = (req, res) => {
 	  	res.status(500).send(error);
 	  	return;
 	  }
-	  res.json({status: 'SUCCESS'});
+	  res.status(200).json({status: 'SUCCESS'});
 	});
 };
 
@@ -253,7 +265,7 @@ module.exports.suspendUser = (req, res) => {
 	  	res.status(500).send(error);
 	  	return;
 	  } 
-	  res.json({status: 'SUCCESS'});
+	  res.status(200).json({status: 'SUCCESS'});
 	});
 
 };
@@ -269,7 +281,7 @@ module.exports.passwordReset = (req, res, userId) => {
 	  	res.status(500).send(error);
 	  	return;
     }
-    res.json({
+    res.status(200).json({
       status: 'SUCCESS',
       link: body
     });
@@ -287,7 +299,7 @@ module.exports.passwordExpire = (req, res ) => {
 	  	res.status(500).send(error);
 	  	return;
     }
-    res.json({
+    res.status(200).json({
       status: 'SUCCESS',
       link: body
     });
