@@ -59,10 +59,8 @@ class LoginPage extends React.Component {
 				username: this.state.username,
 				password: this.state.password })
 		.then(response => {
-			console.log('in submit callback', response);
 
 			if (response.data.status === 'ERROR') {
-				console.log('in error')
 				this.setState({
 					showLoginError: true,
 					username: '',

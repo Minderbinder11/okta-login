@@ -44,7 +44,6 @@ app.all('/api/*', requireLogin);
 
 app.get('/isAuth', ( req, res ) => {
 	if (req.session.userId) {
-		console.log('auth session.userId')
 		res.status(200).send({status: 'ACTIVE'})
 	} else {
 		res.status(200).send({status: 'INACTIVE'})

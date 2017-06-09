@@ -77,7 +77,6 @@ module.exports.getUsers = (req, res) => {
 	  	res.status(200).json({users: body});
 	  }
 	});
-
 };
 
 module.exports.getMFAs = (req, res, userId) => {
@@ -106,7 +105,6 @@ module.exports.getMFAs = (req, res, userId) => {
       mfas: googleAuthenticator, 
       error: false
     });
-    console.log('in get mfa');
   });
 };
 
