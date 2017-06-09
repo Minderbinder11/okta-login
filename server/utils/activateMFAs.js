@@ -22,8 +22,8 @@ module.exports = (req, res) => {
 	request(options, function (error, response, body) {
 	  if (error) {
 	  	res.status(500).send(error);
-	  } else {
-	  	res.status(200).json({status: 'SUCCESS'});
-		}
+	  	return;
+	  }
+	  res.status(200).json({status: 'SUCCESS'});
 	});
 };

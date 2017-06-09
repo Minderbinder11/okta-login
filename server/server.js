@@ -5,7 +5,6 @@ import request 			 	from 'request';
 import bodyParser 	 	from 'body-parser';
 import session 			 	from 'express-session';
 import cookieParser  	from 'cookie-parser';
-import setSession 	 	from './utils/setSession';
 import handleLogin	 	from './utils/handleLogin';
 import activateMFAs  	from './utils/activateMFAs';
 import getActions			from './utils/getActions';
@@ -46,6 +45,7 @@ app.all('/api/*', requireLogin);
 
 app.get('/isAuth', ( req, res ) => {
 	if (req.session.userId) {
+		console.log('auth session.userId')
 		res.send({status: 'ACTIVE'})
 	} else {
 		res.send({status: 'INACTIVE'})

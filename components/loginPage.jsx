@@ -13,15 +13,15 @@ class LoginPage extends React.Component {
 		this.state = {
 			username: '',
 			password: '',
-			showMFA: false,
-			showLoginError: false,
 			mfacode: '',
-			mfaError: false,
-			isAuth: false,
 			mfaEnrollLink: '',
+			isAuth: false,
+			register: false,
+			showMFA: false,
+			mfaError: false,
+			showLoginError: false,
 			resetPassordError: false,
-			passwordResetSuccess: false,
-			register: false
+			passwordResetSuccess: false
 		};
 		this.handleUsernameChange 	= this.handleUsernameChange.bind(this);
 		this.handlePasswordChange		= this.handlePasswordChange.bind(this);
@@ -48,12 +48,21 @@ class LoginPage extends React.Component {
 
 	handleSubmit () {
 
+		this.setState({
+			mfaError: false,
+			showLoginError: false,
+			resetPassordError: false,
+			passwordResetSuccess: false
+		});
+
 		axios.post('/login', {
 				username: this.state.username,
 				password: this.state.password })
 		.then(response => {
+			console.log('in submit callback', response);
 
-			if (response.data.error) {
+			if (response.data.status === 'ERROR') {
+				console.log('in error')
 				this.setState({
 					showLoginError: true,
 					username: '',
@@ -123,17 +132,6 @@ class LoginPage extends React.Component {
 
 		return (
 			<div>
-				{this.state.mfaError && <div className="alert alert-danger login-message" role="alert"> 
-					Incorrect Google Authenticator Code
-				</div>}
-
-				{this.state.resetPassordError && <div className="alert alert-danger login-message successfully-saved" role="alert"> 
-					No user with the login ID.
-				</div>}
-
-				{this.state.passwordResetSuccess && <div className="alert alert-danger login-message successfully-saved" role="alert"> 
-					A Password Reset Email Has Been Sent
-				</div>}
 
 	    <div className="container top-margin">
 	    	<nav className="navbar navbar-default">
@@ -143,6 +141,23 @@ class LoginPage extends React.Component {
       			</a>
     			</div>
 	    	</nav>
+
+				{this.state.showLoginError && <div className="alert alert-danger login-message" role="alert"> 
+					Incorrect Username and Password.
+				</div>}
+
+				{this.state.mfaError && <div className="alert alert-danger login-message" role="alert"> 
+					Incorrect Google Authenticator Code
+				</div>}
+
+				{this.state.resetPassordError && <div className="alert alert-danger login-message successfully-saved" role="alert"> 
+					No User With the login ID.
+				</div>}
+
+				{this.state.passwordResetSuccess && <div className="alert alert-danger login-message successfully-saved" role="alert"> 
+					A Password Reset Email Has Been Sent
+				</div>}
+
 	    	<div className="login-pane">
 	      <div className="card card-container">
 	        <img id="profile-img" className="profile-img-card" src="//ssl.gstatic.com/accounts/ui/avatar_2x.png" />

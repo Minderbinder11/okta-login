@@ -80,29 +80,33 @@ module.exports.getUsers = (req, res) => {
 
 };
 
-module.exports.getMFAs = (req, res) => {
+module.exports.getMFAs = (req, res, userId) => {
 
-  options.url = oktaUrl + '/api/v1/users/'+ req.session.userId +'/factors';
+  options.url = oktaUrl + '/api/v1/users/'+ req.session.tempId +'/factors';
  
   request(options, (error, response, body) => {
     if (error) {
 	  	res.status(500).send(error);
-    } else {
-      body = JSON.parse(body);
-      if (body.length === 0) {
-        res.json({error: true});
-      } else {
-        var googleAuthenticator = body.filter(factor => {
-        		return	(factor.factorType === "token:software:totp" && factor.provider === 'GOOGLE')});
-        var factorId = googleAuthenticator[0].id;
-        req.session.factorId = factorId;
-        res.json({
-          success: 'SUCCESS',
-          mfas: googleAuthenticator, 
-          error: false
-        });
-      }
-    }
+	  	return;
+    } 
+
+    body = JSON.parse(body);
+    
+    if (body.length === 0) {
+      res.json({error: true});
+      return;
+    } 
+    
+    var googleAuthenticator = body.filter(factor => {
+    		return	(factor.factorType === "token:software:totp" && factor.provider === 'GOOGLE')});
+    var factorId = googleAuthenticator[0].id;
+    req.session.factorId = factorId;
+    res.json({
+      success: 'SUCCESS',
+      mfas: googleAuthenticator, 
+      error: false
+    });
+    console.log('in get mfa');
   });
 };
 

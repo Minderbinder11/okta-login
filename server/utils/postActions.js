@@ -32,7 +32,7 @@ module.exports.deleteUser = (req, res) => {
 
 module.exports.validateMFAs = (req, res) => { 
 
-	options.url = oktaUrl + '/api/v1/users/' + req.session.userId + '/factors/' + req.session.factorId + '/verify';
+	options.url = oktaUrl + '/api/v1/users/' + req.session.tempId + '/factors/' + req.session.factorId + '/verify';
 	options.body =  { passCode: req.body.mfacode};
 	options.json = true;
 
@@ -41,7 +41,14 @@ module.exports.validateMFAs = (req, res) => {
 	  	res.status(500).send(error);
 	  	return;
 	  } 
-	  res.status(200).json(body);
+
+	 	if (body.factorResult === 'SUCCESS') {
+	  	req.session.userId = req.session.tempId;
+	  	res.status(200).json(body);
+	  } else {
+	  	res.status(200).json({ error: 'ERROR' })
+	  }
+
 	});
 };
 

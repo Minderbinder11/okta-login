@@ -31,17 +31,20 @@ module.exports = ( req, res ) => {
 
 		if(error) {
 	  	res.status(500).send(error);
+	  	return;
 		} 
-		else if (body.status === 'SUCCESS') {
-	  	req.session.userId = body._embedded.user.id;
-	  	req.session.sessionToken = body.sessionToken;
-			getActions.getMFAs(req, res);
+		 
+		 if (body.status === 'SUCCESS') {
+			// i am callinig this at the wrong time....
+	  	req.session.tempId = body._embedded.user.id;
+	  	console.log('correct username and password');
+			getActions.getMFAs(req, res, req.session.tempId);
 		} 
 		else if (body.status === 'MFA_ENROLL'){
 			postActions.enrollMFAs(req, res, body);
-		} 
-		else {
-	  	res.status(500).send(error);
+		} else {
+			console.log('hellow  from handle login', body);
+	  	res.status(200).json({status: 'ERROR'});
 		}
 	});
 
