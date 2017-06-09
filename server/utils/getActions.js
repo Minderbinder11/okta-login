@@ -1,6 +1,6 @@
-import request from 'request';
-import postActions from './postActions';
-import config from '../../config.json';
+import request 			from 'request';
+import postActions 	from './postActions';
+import config 			from '../../config.json';
 
 const oktaUrl = config.oktaUrl;
 const apiKey = config.API_KEY;
@@ -21,8 +21,7 @@ module.exports.getAUser = (req, res) => {
 
 	request(options, (error, response, body) => {
 	  if (error) {
-	  	throw new Error(error);
-	  	res.json({error: error})
+	  	res.status(500).send(error);
 	  } else {
 	  	body = JSON.parse(body);
 			res.json({
@@ -34,14 +33,30 @@ module.exports.getAUser = (req, res) => {
 };
 
 
+module.exports.getUserById = (req, res) => { 
+
+	options.url = oktaUrl + '/api/v1/users/' + req.params.userId,
+
+	request(options, (error, response, body) => {
+	  if (error) {
+	  	res.status(500).send(error);
+	  } else {
+	  	body = JSON.parse(body);
+			res.json({
+				status: 'SUCCESS',
+				user: body, 
+			})
+		}
+	});
+};
+
 module.exports.getApps = (req, res) => { 
 
 	options.url = oktaUrl + '/api/v1/users/' + req.session.userId + '/appLinks'
 
 	request(options, (error, response, body) => {
 		if (error) {
-			throw new Error(error);
-			res.json({error: error});
+	  	res.status(500).send(error);
 		} else {
 			body = JSON.parse(body);
 			res.json(body);
@@ -56,8 +71,7 @@ module.exports.getUsers = (req, res) => {
 
 	request(options, (error, response, body) => {
 	  if (error) {
-	  	throw new Error(error);
-	  	res.json({error: error});
+	  	res.status(500).send(error);
 	  } else {
 	  	body = JSON.parse(body);
 	  	res.json({users: body});
@@ -72,8 +86,7 @@ module.exports.getMFAs = (req, res) => {
  
   request(options, (error, response, body) => {
     if (error) {
-	  	throw new Error(error);    	
-      res.json({error: true});
+	  	res.status(500).send(error);
     } else {
       body = JSON.parse(body);
       if (body.length === 0) {
@@ -102,8 +115,7 @@ module.exports.getGroups = (req, res) => {
 	request(options, (error, response, body) => {
 
 	  if (error) {
-	  	throw new Error(error);
-	  	res.json({error: error});
+	  	res.status(500).send(error);
 	  } else {
 		 	body = JSON.parse(body);
 		  body.map(group => {
@@ -124,26 +136,22 @@ module.exports.getGroups = (req, res) => {
 
 module.exports.passwordReset = (req, res) => {
 
-
-
  options.url = oktaUrl + '/api/v1/users';
  options.qs = { q: req.query.email };
 
-request(options, function (error, response, body) {
-  if (error) throw new Error(error);
+	request(options, function (error, response, body) {
+	  if (error) {
+	  	res.status(500).send(error);
+	  }
+	  
+	  body = JSON.parse(body);
+		var userId = body[0].id;
 
-  body = JSON.parse(body);
-	//console.log('get password reset', body);
-	var userId = body[0].id;
-
-	if (body[0].profile.email === req.query.email) {
-		postActions.passwordReset(req, res, userId);
-	} else {
-		res.json({status: 'NO_USERID'})
-	}
-
-
-	
+		if (body[0].profile.email === req.query.email) {
+			postActions.passwordReset(req, res, userId);
+		} else {
+			res.json({status: 'NO_USERID'})
+		}	
 	});
 };
 

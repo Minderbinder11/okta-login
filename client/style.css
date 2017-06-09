@@ -51,7 +51,6 @@
 
 .box {
 	margin: 30px auto;
-	/*background-image: url('img/landingpage.jpg'); */
 	width: 700px;
 	height: 300px;
 }
@@ -130,3 +129,15 @@
 .top-margin {
     margin-top: 15px;
 } 
+
+.margins {
+    margin: 5px 10px;
+}
+
+.user-lifeclcye-buttons {
+    margin-left: 20px;
+}
+
+.user-manager {
+    margin-top: 15px;
+}

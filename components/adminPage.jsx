@@ -107,7 +107,6 @@ class AdminPage extends React.Component {
 			});
 		} else {
 			var filterList = this.state.everyone.filter(user => user.status === e.target.id);
-			console.log('filetred List', filterList)
 			this.setState({
 				selected: filterList,
 				currentlySelectedStage: e.target.id
@@ -150,8 +149,6 @@ class AdminPage extends React.Component {
 					this.initializeState();
 				}
 			})
-		} else {
-			console.log('no user selected');
 		}
 	}
 
@@ -166,10 +163,7 @@ class AdminPage extends React.Component {
 					this.initializeState();
 				}
 			});
-		} else {
-			// send message to user the current user is not active
-			console.log('no selected User or users is not active')
-		}
+		} 
 	}
 
 	deleteUser (e) {
@@ -181,8 +175,6 @@ class AdminPage extends React.Component {
 					this.initializeState();
 				}
 			});
-		} else {
-			console.log('no user selected')
 		}
 	}
 
@@ -286,7 +278,7 @@ class AdminPage extends React.Component {
 		var classes = "list-group-item status-item";
 		return (
 			<div className="container-fluid">
-			    <nav className="navbar navbar-default">
+			    <nav className="navbar navbar-default top-margin ">
              <div className="container-fluid">
                 <div className="navbar-header">
                   <button type="button" className="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
@@ -309,104 +301,104 @@ class AdminPage extends React.Component {
                 </div>
               </div>
           </nav>
+       <div className="user-lifeclcye-buttons">
+		    <DropdownButton className="margins" bsStyle={"primary"} title={"User Actions"} id={"1"}>
+		      <MenuItem onClick={this.createUser}>Create User</MenuItem>
+		      { this.state.selectedUser !== '' &&
+		      <MenuItem onClick={this.updateUser}>Update User</MenuItem>}
+		      { this.state.selectedUser !== '' &&
+		      <MenuItem onClick={this.deleteUser}>Delete User</MenuItem>}
+		    </DropdownButton>
+				
+				{ this.state.selectedUser &&			
+		    <DropdownButton className="margins" bsStyle={"primary"} title={"Lifecycle Actions"} id={"2"}>
+		    
+		    	{ this.state.selectedUser.status ==='PROVISIONED' && 
+		    		<MenuItem onClick={this.reactivateUser}>Rectivate User</MenuItem> }
 
-    <DropdownButton bsStyle={"primary"} title={"User Actions"} id={"1"}>
-      <MenuItem onClick={this.createUser}>Create User</MenuItem>
-      { this.state.selectedUser !== '' &&
-      <MenuItem onClick={this.updateUser}>Update User</MenuItem>}
-      { this.state.selectedUser !== '' &&
-      <MenuItem onClick={this.deleteUser}>Delete User</MenuItem>}
-    </DropdownButton>
-		
-		{ this.state.selectedUser &&			
-    <DropdownButton bsStyle={"primary"} title={"Lifecycle Actions"} id={"2"}>
-    
-    	{ this.state.selectedUser.status ==='PROVISIONED' && 
-    		<MenuItem onClick={this.reactivateUser}>Rectivate User</MenuItem> }
+			    { this.state.selectedUser.status ==='STAGED' &&
+			      <MenuItem onClick={this.activateUser}>Activate User</MenuItem> }
 
-	    { this.state.selectedUser.status ==='STAGED' &&
-	      <MenuItem onClick={this.activateUser}>Activate User</MenuItem> }
+			    {  this.state.selectedUser.status !== 'DEPROVISIONED' &&
+			      <MenuItem onClick={this.deactivateUser}>Deactivate User</MenuItem> }
 
-	    {  this.state.selectedUser.status !== 'DEPROVISIONED' &&
-	      <MenuItem onClick={this.deactivateUser}>Deactivate User</MenuItem> }
+			    { this.state.selectedUser.status === 'LOCKED_OUT' &&
+			      <MenuItem onClick={this.unlockUser}>Unlock User</MenuItem>} 
+			  
+			    {  this.state.selectedUser.status !== 'PASSWORD_EXPIRED' &&
+			      <MenuItem onClick={this.passwordExpire}>Expire Password</MenuItem>}
+			  
+			    {  this.state.selectedUser.status === 'RECOVERY' &&
+			      <MenuItem onClick={this.resetUser}>Reset User</MenuItem>}
+			    
+			    { this.state.selectedUser.status ==='ACTIVE' &&
+			      <MenuItem onClick={this.suspendUser}>Suspend User</MenuItem>}
 
-	    { this.state.selectedUser.status === 'LOCKED_OUT' &&
-	      <MenuItem onClick={this.unlockUser}>Unlock User</MenuItem>} 
-	  
-	    {  this.state.selectedUser.status !== 'PASSWORD_EXPIRED' &&
-	      <MenuItem onClick={this.passwordExpire}>Expire Password</MenuItem>}
-	  
-	    {  this.state.selectedUser.status === 'RECOVERY' &&
-	      <MenuItem onClick={this.resetUser}>Reset User</MenuItem>}
-	    
-	    { this.state.selectedUser.status ==='ACTIVE' &&
-	      <MenuItem onClick={this.suspendUser}>Suspend User</MenuItem>}
+			    { this.state.selectedUser.status ==='SUSPENDED' &&
+			      	<MenuItem onClick={this.unsuspendUser}>Unsuspend User</MenuItem>}
 
-	    { this.state.selectedUser.status ==='SUSPENDED' &&
-	      	<MenuItem onClick={this.unsuspendUser}>Unsuspend User</MenuItem>}
+			    {  this.state.selectedUser.status ==='SUSPENDED' &&	
+			     		<MenuItem onClick={this.deactivateUser}>Deactivate User</MenuItem>}
+		    
 
-	    {  this.state.selectedUser.status ==='SUSPENDED' &&	
-	     		<MenuItem onClick={this.deactivateUser}>Deactivate User</MenuItem>}
-    
+			    </DropdownButton> }
 
-    </DropdownButton> }
-
-    {!this.state.selectedUser && 
- 			<DropdownButton bsStyle={"primary"} title={"Lifecycle Actions"} id={"2"}>
- 			<MenuItem>No User Selected</MenuItem>
- 			</DropdownButton>
-    }
-
-				<div className="user-manager">
-					<div className="status-filter">
-					<div className="filterLabel"> Filters</div>
-						<ul className="status-list col-md-3">
-							{lifecycleStages.map(stage => {
-								if (this.state.currentlySelectedStage === stage.name) {
-									classes += " active"
-								} else {
-									classes = "list-group-item status-item";
-								}
-							return 	(<li id={stage.name} className={classes} 
-									onClick={this.displayUsers} key={stage.name}>
-									<span className="badge">{stage.count}</span>
-									{stage.name}
-							</li>)
-						})}
-						</ul>
-					</div>
-					<div className="user-list col-md-9">
-      				<div className="panel panel-default">
-        				<div className="panel-heading">
-          				<h4>Selected Users</h4>
-        				</div>
-						<table className="table table-striped ">
-
-							<thead>
-								<tr>
-	                <th className="col-md-6">User</th>
-	                <th className="col-md-4">Email</th>
-	                <th className="col-md-2">Status</th>
-	               </tr>
-							</thead>
-
-							<tbody>
-							{
-								selected.map(user => {
-									var selected = false;
-									if (user.id === this.state.selectedUser.id) {
-										selected = true
-									}
-									return (<AdminTableRow user={user} selected={selected} 
-														key={user.id} selectUser={this.selectUser.bind(this, user)}/>)
+			    {!this.state.selectedUser && 
+			 			<DropdownButton bsStyle={"primary"} title={"Lifecycle Actions"} id={"2"}>
+			 			<MenuItem>No User Selected</MenuItem>
+			 			</DropdownButton>
+			    }
+		    </div>
+						<div className="user-manager">
+							<div className="status-filter">
+							<div className="filterLabel"></div>
+								<ul className="status-list col-md-3">
+									{lifecycleStages.map(stage => {
+										if (this.state.currentlySelectedStage === stage.name) {
+											classes += " active"
+										} else {
+											classes = "list-group-item status-item";
+										}
+									return 	(<li id={stage.name} className={classes} 
+											onClick={this.displayUsers} key={stage.name}>
+											<span className="badge">{stage.count}</span>
+											{stage.name}
+									</li>)
 								})}
-							</tbody>
+								</ul>
+							</div>
+							<div className="user-list col-md-9">
+		      				<div className="panel panel-default">
+		        				<div className="panel-heading">
+		          				<h4>Selected Users</h4>
+		        				</div>
+								<table className="table table-striped ">
 
-						</table>
+									<thead>
+										<tr>
+			                <th className="col-md-6">User</th>
+			                <th className="col-md-4">Email</th>
+			                <th className="col-md-2">Status</th>
+			               </tr>
+									</thead>
+
+									<tbody>
+									{
+										selected.map(user => {
+											var selected = false;
+											if (user.id === this.state.selectedUser.id) {
+												selected = true
+											}
+											return (<AdminTableRow user={user} selected={selected} 
+																key={user.id} selectUser={this.selectUser.bind(this, user)}/>)
+										})}
+									</tbody>
+
+								</table>
+								</div>
+								</div>
 						</div>
-						</div>
-				</div>
-			</div>
+					</div>
 			);
 	}
 };

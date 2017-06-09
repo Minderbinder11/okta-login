@@ -16,6 +16,22 @@ var options = {
    } 
  };
 
+module.exports.validateMFAs = (req, res) => { 
+
+	options.url = oktaUrl + '/api/v1/users/' + req.session.userId + '/factors/' + req.session.factorId + '/verify';
+	options.body =  { passCode: req.body.mfacode};
+	options.json = true;
+
+	request(options, function (error, response, body) {
+	  if (error) {
+	  	res.status(500).send(error);
+	  	return;
+	  } 
+	  res.status(200).json(body);
+	});
+};
+
+
 module.exports.register = (req, res) => {
 
 	var getoptions = {
@@ -25,7 +41,6 @@ module.exports.register = (req, res) => {
 			 'authorization': 'SSWS '+ apiKey,
 	     'content-type': 'application/json',
 	     'accept': 'application/json' }
-
 	};
 
 	getoptions.url = oktaUrl + '/api/v1/users?q=' + req.body.email
@@ -34,7 +49,8 @@ module.exports.register = (req, res) => {
 
 	 		var userFound = false;
 		 	if (error) {
-		 		throw new Error(error);
+	  		res.status(500).send(error);
+	  		return;
 		 	}
 		 	body = JSON.parse(body);
 
@@ -60,11 +76,11 @@ module.exports.unlockUser = (req, res) => {
 
 	request(options, function (error, response, body) {
 	  if (error) {
-	  	throw new Error(error);
-	  	res.json({error: error});
-	  } else {
-	  	res.json({status: 'SUCCESS'})
+	  	res.status(500).send(error);
+	  	return;
 	  }
+	  res.json({status: 'SUCCESS'})
+	  
 	});
 };
 
@@ -75,8 +91,7 @@ module.exports.reactivateUser = (req, res) => {
 
 	request(options, function (error, response, body) {		
 	  if (error) {
-	  	throw new Error(error);
-	  	res.json({error: error});
+	  	res.status(500).send(error);
 	  } else {
 	  	res.json({status: 'SUCCESS'})
 	  }
@@ -89,8 +104,7 @@ module.exports.deactivateUser = (req, res) => {
 
 	request(options, function (error, response, body) {
 	  if (error) {
-	  	throw new Error(error);
-	  	res.json({error: error});
+	  	res.status(500).send(error);
 	  } else {
 	  	res.json({status: 'SUCCESS'})
 	  }
@@ -111,8 +125,7 @@ module.exports.enrollMFAs = (req, res, body) => {
 	request(options, (error, response, body) => {
 	  
 	  if (error) {
-	  	throw new Error(error);
-	  	res.json({error: error});  	
+	  	res.status(500).send(error); 	
 	  } else {
 		  req.session.factorId = body.id;
 		  res.json({
@@ -144,10 +157,8 @@ function newUser (req, res) {
 
 	request(options, function (error, response, body) {
 	  if (error) {
-	  	throw new Error(error);
-	  	res.json({error: error});
+	  	res.status(500).send(error);
 	  } else {
-	  	console.log('in new user', body);
 
 	  		options.url = oktaUrl + '/api/v1/users/'+ body.id +'/lifecycle/activate';
   			options.qs = { sendEmail: true };
@@ -174,8 +185,7 @@ module.exports.activateUser = (req, res) => {
 
 	request(options, function (error, response, body) {
 	  if (error) {
-	  	throw new Error(error);
-	  	res.json({error: error});
+	  	res.status(500).send(error);
 	  } else {
 	  	res.json({status: 'SUCCESS'})
 	  }
@@ -195,13 +205,11 @@ module.exports.updateUser = (req, res) => {
 
 	request(options, (error, response, body) => {
 	  if (error) {
-	  	throw new Error(error);
-	  	res.json({error: error})
+	  	res.status(500).send(error);
 	  } else {
 	  	res.json({status: 'SUCCESS'});
 	  }
 	});
-
 };
 
 module.exports.unsuspendUser = (req, res) => { 
@@ -210,13 +218,11 @@ module.exports.unsuspendUser = (req, res) => {
 
 	request(options, (error, response, body) => {
 	  if (error) {
-	  	throw new Error(error);
-	  	res.json({error: error});
+	  	res.status(500).send(error);
 	  } else {
 	  res.json({status: 'SUCCESS'});
 		}
 	});
-	
 };
 
 module.exports.suspendUser = (req, res) => {
@@ -225,8 +231,7 @@ module.exports.suspendUser = (req, res) => {
 
 	request(options, (error, response, body) => {
 	  if (error) {
-	  	throw new Error(error);
-	  	res.json({error: error});
+	  	res.status(500).send(error);
 	  } else {
 	  res.json({status: 'SUCCESS'});
 		}
@@ -234,7 +239,7 @@ module.exports.suspendUser = (req, res) => {
 
 };
 
-// check on the userID field,  shouldnt this come from req.body.userId?
+
 module.exports.passwordReset = (req, res, userId) => {  
 
   options.url = oktaUrl + '/api/v1/users/' + userId + '/lifecycle/reset_password';
@@ -242,11 +247,7 @@ module.exports.passwordReset = (req, res, userId) => {
 
   request(options, (error, response, body) => {
     if (error) {
-      throw new Error(error);
-      res.json({
-      	status: 'ERROR',
-      	error: error
-      });
+	  	res.status(500).send(error);
     } else {
       res.json({
         status: 'SUCCESS',
@@ -254,7 +255,6 @@ module.exports.passwordReset = (req, res, userId) => {
       });
     }
   });
-
 };
 
 
@@ -265,8 +265,7 @@ module.exports.passwordExpire = (req, res ) => {
 
   request(options, (error, response, body) => {
     if (error) {
-      throw new Error(error);
-      res.json({error: error});
+	  	res.status(500).send(error);
     } else {
       res.json({
         status: 'SUCCESS',
@@ -274,7 +273,6 @@ module.exports.passwordExpire = (req, res ) => {
       });
     }
   });
-
 };
 
 

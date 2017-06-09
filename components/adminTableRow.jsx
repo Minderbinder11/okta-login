@@ -7,7 +7,7 @@ class AdminTableRow extends React.Component {
 
 	constructor(props) {
 		super(props);
-		this.state = {selected: this.props.selected};
+		this.state = { selected: this.props.selected };
 		this.selectRow = this.selectRow.bind(this);
 	}
 

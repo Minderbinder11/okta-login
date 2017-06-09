@@ -1,3 +1,4 @@
+
 // deleteUser.js
 
 import request from 'request';
@@ -19,8 +20,7 @@ module.exports = (req, res) => {
 
 	request(options, (error, response, body) => {
 	  if (error) {
-	  	throw new Error(error);
-	  	res.json({error: error})
+	  	res.status(500).send(error);
 	  } else{
 	  	res.json({status: 'SUCCESS'});
 	  }

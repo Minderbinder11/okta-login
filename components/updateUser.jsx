@@ -36,9 +36,7 @@ class UpdateUser extends React.Component {
 
 		axios.get('/api/getUser/' + this.props.match.params.userId)
 		.then(response => {
-			console.log('response fro /api/getUsers', response);
-			var user = response.data.user;
-			// user = JSON.parse(user);
+			var user = response.data.user; 
 			
 			this.setState({
 				userUpdated: 		false,
@@ -89,11 +87,9 @@ class UpdateUser extends React.Component {
 				this.setState({userUpdated: true});
 			}
 		});
-
 	}
 
-	usernameChange (e) {
-		e.stopPropagation();
+	usernameChange (e) { e.stopPropagation();
 		this.setState({login: e.target.value});
 	}
 
@@ -181,38 +177,38 @@ class UpdateUser extends React.Component {
 
 			<label>Username</label>
 			<input type="text" id="login" className="form-control" value={this.state.login} 
-							onChange={this.usernameChange} required autoFocus></input>
+							onChange={this.usernameChange}></input>
 
 			<label>First Name</label>
 			<input type="text" id="firstname" className="form-control" value={this.state.firstName} 
-							onChange={this.firstNameChange} required></input>
+							onChange={this.firstNameChange}></input>
 
 			<label>Last Name</label>
 			<input type="text" id="lastname" className="form-control" value={this.state.lastName} 
-							onChange={this.lastNameChange} required></input>
+							onChange={this.lastNameChange}></input>
 
 			<label>Email</label>
 			<input type="text" id="email" className="form-control" value={this.state.email} 
-							onChange={this.emailChange} required></input>
+							onChange={this.emailChange}></input>
 
 			<label>Address</label>
 			<input type="text" id="address" className="form-control" value={this.state.streetAddress} 
-							onChange={this.addressChange} required></input>
+							onChange={this.addressChange}></input>
 
 			<label>City</label>
 			<input type="text" id="city" className="form-control" value={this.state.city} 
-							onChange={this.cityChange} required></input>
+							onChange={this.cityChange}></input>
 
 			<label>State</label>
 			<input type="text" id="state" className="form-control" value={this.state.state} 
-							onChange={this.stateChange} required></input>
+							onChange={this.stateChange}></input>
 
 			<label>Zip</label>
 			<input type="text" id="zip" className="form-control" value={this.state.zipCode} 
-							onChange={this.zipChange} required></input>
+							onChange={this.zipChange}></input>
 
-			<Button bsStyle="primary" onClick={this.handleSubmit}>Update</Button>
-			<Button onClick={this.handleCancel}>Cancel</Button>
+			<Button className="margins" bsStyle="primary" onClick={this.handleSubmit}>Update</Button>
+			<Button className="margins" onClick={this.handleCancel}>Cancel</Button>
 
 			</div>);
 	}

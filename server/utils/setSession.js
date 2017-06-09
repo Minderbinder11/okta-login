@@ -17,13 +17,12 @@ module.exports = (req, res, sessionToken ) => {
   };
 
   function callback(error, response, body) {
-    if (!error) {
-        body = JSON.parse(body);
-         req.session.sessionId = body.id;
-         
+    if (error) {
+      res.status(500).send(error);
     } else {
-      console.log('error: ', error);
-    }
+      body = JSON.parse(body);
+      req.session.sessionId = body.id;   
+    } 
   }
 
   request(options, callback);

@@ -60,8 +60,7 @@ class RegistrationPage extends React.Component {
 				username: 	this.state.email
 			})
 			.then(response => {
-
-				console.log('password response', response.data)
+				
 				if (response.data.status === 'SUCCESS') {
 					this.setState({newUserVaidated: true});
 				} else if (response.data.status === 'USER_EXISTS') {
@@ -69,7 +68,7 @@ class RegistrationPage extends React.Component {
 						passwordError: true,
 						errorMessage: 'That email is already registered'
 						});
-					console.log('user exists');
+					// take some action tp alert the uesre exists
 				} else if (response.data.error) {
 					console.log(response.data.error);
 				}

@@ -36,18 +36,13 @@ class HomePage extends React.Component {
 
     axios.get('/api/applinks')
     .then(response => {
-      console.log('apps: ', response.data);
       this.setState({apps: response.data})
     });
 
     axios.get('/api/groups')
     .then(response => {
-      console.log('group response: ', response);
       if (response.data.status === 'admin') {
         this.setState({isAdmin: true});
-        console.log('is admin', this.state.isAdmin);
-      } else {
-        console.log('not an admin');
       }
     });
   }

@@ -7,7 +7,6 @@ import session 			 	from 'express-session';
 import cookieParser  	from 'cookie-parser';
 import setSession 	 	from './utils/setSession';
 import handleLogin	 	from './utils/handleLogin';
-import validateMFAs	 	from './utils/validateMFAs';
 import activateMFAs  	from './utils/activateMFAs';
 import deleteUser 	 	from './utils/deleteUser';
 import getActions			from './utils/getActions';
@@ -68,7 +67,7 @@ app.get('/isAuth', ( req, res ) => {
 	});
 
 	app.post('/register', 		(req, res) => { postActions.register(req, res); });
-	app.post('/mfa', 					(req, res) => { validateMFAs(req, res); });
+	app.post('/mfa', 					(req, res) => { postActions.validateMFAs(req, res); });
 	app.get('/passwordreset', (req, res) => { getActions.passwordReset(req, res); });
 
 /*
@@ -90,7 +89,7 @@ app.get('/isAuth', ( req, res ) => {
 	app.get('/api/applinks', 				(req, res) => { getActions.getApps(req, res); });
 	app.get('/api/groups', 					(req, res) => { getActions.getGroups(req, res); });
 	app.get('/api/getUsers', 				(req, res) => { getActions.getUsers(req, res); });
-	app.get('/api/getUser/:userId', (req, res) => { getActions.getAUser(req,res); });
+	app.get('/api/getUser/:userId', (req, res) => { getActions.getUserById(req,res); });
 	app.get('/api/getCurrentUser', 	(req, res) => {	getActions.getAUser(req, res)});
 
 /*

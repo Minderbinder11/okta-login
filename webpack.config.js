@@ -1,12 +1,14 @@
 // webpack.config.js
 
-var path = require('path');
+var path    = require ('path');
+var webpack = require ('webpack');
+
 
 module.exports = {
   entry: './components/index.jsx',
   output: {
     path: path.resolve(__dirname, 'client/dist'),
-    filename: 'bundle.js'
+    filename: 'bundle.min.js'
   },
   module: {
     loaders: [
@@ -18,5 +20,29 @@ module.exports = {
         } 
       }
     ]
-  }
+  },
+  plugins: [
+    new webpack.LoaderOptionsPlugin({
+      minimize: true,
+      debug: false
+    }),
+    new webpack.DefinePlugin({
+      'process.env': {
+        NODE_ENV: JSON.stringify('production')
+      }
+    }),
+    new webpack.optimize.UglifyJsPlugin({
+      compress: {
+        warnings: false
+      },
+      sourceMap: true,
+      comments: function(node, comment) {
+        // Remove other Okta copyrights
+        var isLicense = /^!/.test(comment.value);
+        var isOkta = /.*Okta.*/.test(comment.value);
+        return isLicense && !isOkta;
+      }
+    }),
+
+  ]
 };

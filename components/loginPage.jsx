@@ -54,7 +54,6 @@ class LoginPage extends React.Component {
 		.then(response => {
 
 			if (response.data.error) {
-				console.log('error')
 				this.setState({
 					showLoginError: true,
 					username: '',
@@ -72,7 +71,7 @@ class LoginPage extends React.Component {
 			}
 		})
 		.catch(err => {
-			console.log('error')
+			console.log(err);
 		})
 	}
 
@@ -101,18 +100,14 @@ class LoginPage extends React.Component {
 
 		axios.get('/passwordreset', {params: {email: this.state.username}})
 		.then(response => {
-
 			if (response.data.status === 'SUCCESS') {
 				this.setState({passwordResetSuccess: true});
 			} else if (response.data.status === 'NO_USERID') {
 				this.setState({resetPassordError: true });
-			} else if (response.data.status === 'ERROR') {
-				console.log('error in password reset');
-			}
-
+			} 
 		})
-		.catch(error => {
-			console.log(error)
+		.catch(err => {
+			console.log(err);
 		});
 	}
 
