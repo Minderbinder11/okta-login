@@ -5,9 +5,7 @@ import request 			 	from 'request';
 import bodyParser 	 	from 'body-parser';
 import session 			 	from 'express-session';
 import cookieParser  	from 'cookie-parser';
-import setSession 	 	from './utils/setSession';
 import handleLogin	 	from './utils/handleLogin';
-import activateMFAs  	from './utils/activateMFAs';
 import getActions			from './utils/getActions';
 import postActions 		from './utils/postActions';
 
@@ -52,9 +50,6 @@ app.get('/isAuth', ( req, res ) => {
 	}
 });
 
-/*
- * LOGIN POST ACTIONS
- */
 
 	app.post('/login', (req, res) => {
 
@@ -65,6 +60,9 @@ app.get('/isAuth', ( req, res ) => {
 		}
 	});
 
+/*
+ * LOGIN ACTIONS
+ */
 	app.post('/register', 		(req, res) => { postActions.register(req, res); });
 	app.post('/mfa', 					(req, res) => { postActions.validateMFAs(req, res); });
 	app.get('/passwordreset', (req, res) => { getActions.passwordReset(req, res); });

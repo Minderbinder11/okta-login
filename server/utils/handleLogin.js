@@ -31,8 +31,10 @@ module.exports = ( req, res ) => {
 
 		if(error) {
 	  	res.status(500).send(error);
+	  	return;
 		} 
-		else if (body.status === 'SUCCESS') {
+		
+		if (body.status === 'SUCCESS') {
 	  	req.session.userId = body._embedded.user.id;
 	  	req.session.sessionToken = body.sessionToken;
 			getActions.getMFAs(req, res);

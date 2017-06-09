@@ -48,6 +48,13 @@ class LoginPage extends React.Component {
 
 	handleSubmit () {
 
+		this.setState({ 
+			showLoginError: false,
+			mfaError: false,
+			resetPassordError: false,
+			passwordResetSuccess: false,
+		});
+
 		axios.post('/login', {
 				username: this.state.username,
 				password: this.state.password })
@@ -67,6 +74,7 @@ class LoginPage extends React.Component {
 					mfaEnrollLink: response.data.href
 				});
 			} else {
+				console.log('last showMFA');
 				this.setState({showMFA: true});		
 			}
 		})
@@ -77,7 +85,7 @@ class LoginPage extends React.Component {
 
 	handleMFASubmit () {
 
-		this.setState({mfaError: false});
+		this.setState({ mfaError: false });
 		axios.post('/mfa', {mfacode: this.state.mfacode })
 		.then( response => {
 
@@ -123,6 +131,16 @@ class LoginPage extends React.Component {
 
 		return (
 			<div>
+
+	    <div className="container top-margin">
+	    	<nav className="navbar navbar-default">
+	    		<div className="navbar-header">
+      			<a className="navbar-brand" href="#">
+        			<img alt="Brand" src="img/updateUser.png" height="30px"/>
+      			</a>
+    			</div>
+	    	</nav>
+
 				{this.state.mfaError && <div className="alert alert-danger login-message" role="alert"> 
 					Incorrect Google Authenticator Code
 				</div>}
@@ -135,14 +153,7 @@ class LoginPage extends React.Component {
 					A Password Reset Email Has Been Sent
 				</div>}
 
-	    <div className="container top-margin">
-	    	<nav className="navbar navbar-default">
-	    		<div className="navbar-header">
-      			<a className="navbar-brand" href="#">
-        			<img alt="Brand" src="img/updateUser.png" height="30px"/>
-      			</a>
-    			</div>
-	    	</nav>
+
 	    	<div className="login-pane">
 	      <div className="card card-container">
 	        <img id="profile-img" className="profile-img-card" src="//ssl.gstatic.com/accounts/ui/avatar_2x.png" />

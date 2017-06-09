@@ -83,12 +83,8 @@
 }
 
 .pull-right {
-    float: right !important; // Use of important emulates bootstrap
+    float: right !important; 
 }
-
-/*
- * Form styles
- */
 
  .shareLine {
     display: inline-block;
@@ -110,21 +106,15 @@
      opacity: 1;
 }
 
-
-/* Login Page
-*/
-
 .user-apps {
     list-style-type: none;
     padding-right: 20px;
     float: left;
-
 }
 
 .selected-row {
     background-color: lightblue;
 }
-
 
 .top-margin {
     margin-top: 15px;

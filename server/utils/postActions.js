@@ -16,6 +16,23 @@ var options = {
    } 
  };
 
+// may be defunct
+module.exports.activateMFAs = (req, res) => { 
+
+	options.url = 'https://dev-477147.oktapreview.com/api/v1/users/'+ req.session.userId +'/factors/'+ req.session.factorId +'/lifecycle/activate';
+  options.body = { passCode: req.body.mfacode };
+  options.json = true;
+
+	request(options, function (error, response, body) {
+	  if (error) {
+	  	res.status(500).send(error);
+	  	return;
+	  }
+	  res.status(200).json({status: 'SUCCESS'});
+	});
+};
+
+
 module.exports.deleteUser = (req, res) => { 
 
 	options.url = oktaUrl + '/api/v1/users/' + req.body.userId + '/lifecycle/deactivate';
