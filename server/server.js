@@ -44,9 +44,9 @@ app.all('/api/*', requireLogin);
 
 app.get('/isAuth', ( req, res ) => {
 	if (req.session.userId) {
-		res.send({status: 'ACTIVE'})
+		res.status(200).send({status: 'ACTIVE'})
 	} else {
-		res.send({status: 'INACTIVE'})
+		res.status(200).send({status: 'INACTIVE'})
 	}
 });
 
@@ -54,7 +54,7 @@ app.get('/isAuth', ( req, res ) => {
 	app.post('/login', (req, res) => {
 
 		if(req.session.body) {
-			res.json({status: 'AUTHENTICATED'});
+			res.status(200).json({status: 'AUTHENTICATED'});
 		} else {
 			handleLogin(req, res);
 		}
@@ -96,7 +96,7 @@ app.get('/isAuth', ( req, res ) => {
 
 app.get('/logout', (req, res) => {
 	req.session.destroy();
-	res.send({logout: 'logout'});
+	res.status(200).send({logout: 'logout'});
 });
 
 app.get('/*', (req, res) => { res.redirect('/'); });

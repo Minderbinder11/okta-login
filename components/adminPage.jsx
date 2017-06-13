@@ -141,7 +141,6 @@ class AdminPage extends React.Component {
 
 	unsuspendUser (e) {
 		e.stopPropagation();
-
 		if (this.state.selectedUser && this.state.selectedUser.status === 'SUSPENDED' ) {
 			axios.post('/api/unsuspendUser', {userId: this.state.selectedUser.id})
 			.then(response => {
@@ -156,7 +155,6 @@ class AdminPage extends React.Component {
 	suspendUser (e) {
 		e.stopPropagation();		
 		if (this.state.selectedUser && this.state.selectedUser.status === 'ACTIVE') {
-
 			axios.post('/api/suspendUser', {userId: this.state.selectedUser.id})
 			.then(response => {
 				if (response.data.status === 'SUCCESS') {

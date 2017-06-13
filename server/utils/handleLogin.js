@@ -1,13 +1,10 @@
-
 //handleLogin.js
-
 import request 			from 'request';
 import getActions 	from './getActions';
 import postActions	from './postActions';
 import config from '../../config.json';
 
 const oktaUrl = config.oktaUrl;
-
 
 module.exports = ( req, res ) => { 
 
@@ -33,17 +30,15 @@ module.exports = ( req, res ) => {
 	  	res.status(500).send(error);
 	  	return;
 		} 
-		
+		 
 		if (body.status === 'SUCCESS') {
-	  	req.session.userId = body._embedded.user.id;
-	  	req.session.sessionToken = body.sessionToken;
-			getActions.getMFAs(req, res);
+	  	req.session.tempId = body._embedded.user.id;
+			getActions.getMFAs(req, res, req.session.tempId);
 		} 
 		else if (body.status === 'MFA_ENROLL'){
 			postActions.enrollMFAs(req, res, body);
-		} 
-		else {
-	  	res.status(500).send(error);
+		} else {
+	  	res.status(200).json({status: 'ERROR'});
 		}
 	});
 
