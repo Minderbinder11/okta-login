@@ -3,6 +3,7 @@
 .DS_Store
 
 node_modules/
+client/dist/
 client/dist/bundle.js
 client/dist/serveme.js
 
