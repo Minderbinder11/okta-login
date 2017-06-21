@@ -1,7 +1,7 @@
 // postActions.js
 
 import request from 'request';
-import config from '../../config.json';
+import config from '../config.json';
 
 const oktaUrl = config.oktaUrl;
 const apiKey = config.API_KEY;

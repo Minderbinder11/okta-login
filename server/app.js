@@ -12,7 +12,7 @@ import postActions 		from './utils/postActions';
 
 //import middlewareActiveSession from './utils/middlewareActiveSession';
 
-const port = process.env.port || 8000;
+const port = process.env.PORT || 8000;
 
 const app = express();
 app.set('host', process.env.HOST || '127.0.0.1');
