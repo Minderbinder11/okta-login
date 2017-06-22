@@ -4,7 +4,7 @@ import React from 'react';
 import axios from 'axios';
 import { Redirect } from 'react-router';
 import HomePage from './homePage.jsx';
-
+import './loginPage.css';
 
 class LoginPage extends React.Component {
 
@@ -140,7 +140,7 @@ class LoginPage extends React.Component {
       			</a>
     			</div>
 	    	</nav>
-
+				<div className="tester"></div>
 
 				{this.state.showLoginError && <div className="alert alert-danger login-message" role="alert"> 
 					Incorrect Username and Password.

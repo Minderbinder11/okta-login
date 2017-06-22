@@ -79,10 +79,6 @@ app.get('/isAuth', function (req, res) {
 	}
 });
 
-/*
- * LOGIN POST ACTIONS
- */
-
 app.post('/login', function (req, res) {
 
 	if (req.session.body) {
@@ -92,6 +88,9 @@ app.post('/login', function (req, res) {
 	}
 });
 
+/*
+ * LOGIN ACTIONS
+ */
 app.post('/register', function (req, res) {
 	_postActions2.default.register(req, res);
 });

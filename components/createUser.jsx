@@ -5,6 +5,7 @@ import axios from 'axios';
 import { Redirect, Link } from 'react-router-dom';
 import { DropdownButton, MenuItem } from 'react-bootstrap';
 import { Button } from 'react-bootstrap';
+import './createUser.css';
 
 class CreateUser extends React.Component {
 

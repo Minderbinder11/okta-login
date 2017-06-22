@@ -2,7 +2,7 @@
 import request 			from 'request';
 import getActions 	from './getActions';
 import postActions	from './postActions';
-import config from '../config.json';
+import config 			from '../config.json';
 
 const oktaUrl = config.oktaUrl;
 

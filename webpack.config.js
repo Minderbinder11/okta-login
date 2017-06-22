@@ -11,6 +11,8 @@ module.exports = {
     filename: 'bundle.min.js'
   },
   module: {
+    // need to add a CSS loader to bring in CSS files
+    // check this out to add vendor prefixes to css files [Autoprefixer](https://github.com/postcss/autoprefixer) - from create-react-app readme
     loaders: [
       { test: /\.jsx$/, 
         exclude: /node_modules/, 
@@ -18,6 +20,9 @@ module.exports = {
         query: {
           presets: ['es2015', 'react']
         } 
+      },
+      { test: /\.css$/, 
+        loader: "style-loader!css-loader" 
       }
     ]
   },

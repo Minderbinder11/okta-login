@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
+import './adminTableRow.css';
 
 class AdminTableRow extends React.Component {
 
@@ -37,5 +38,11 @@ class AdminTableRow extends React.Component {
 			);
 	}
 }
+
+AdminTableRow.propTypes = {
+  user: React.PropTypes.object.isRequired,
+	selected: React.PropTypes.object.isRequired,
+  selectUser: React.PropTypes.object.isRequired
+};
 
 module.exports = AdminTableRow;
