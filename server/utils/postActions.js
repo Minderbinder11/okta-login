@@ -16,6 +16,9 @@ var options = {
    } 
  };
 
+/*
+ * Depricated
+ */
 
 module.exports.activateMFAs = (req, res) => { 
 
