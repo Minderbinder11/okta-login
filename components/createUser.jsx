@@ -5,6 +5,7 @@ import axios from 'axios';
 import { Redirect, Link } from 'react-router-dom';
 import { DropdownButton, MenuItem } from 'react-bootstrap';
 import { Button } from 'react-bootstrap';
+import './createUser.css';
 
 class CreateUser extends React.Component {
 
@@ -191,8 +192,8 @@ class CreateUser extends React.Component {
 			<input type="text" id="zip" className="form-control" value={this.state.zip} 
 							onChange={this.zipChange} required></input>
 
-			<Button bsStyle="primary" onClick={this.handleSubmit}>Create User</Button>
-			<Button onClick={this.cancel}>Cancel</Button>
+			<Button bsStyle="primary" onClick={this.handleSubmit} className="margins">Create User</Button>
+			<Button onClick={this.cancel} className="margins">Cancel</Button>
 
 			</div>);
 	}

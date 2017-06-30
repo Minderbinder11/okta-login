@@ -5,7 +5,7 @@ import axios from 'axios';
 import { Redirect } from 'react-router-dom';
 import AdminTableRow from './adminTableRow.jsx';
 import { DropdownButton, MenuItem } from 'react-bootstrap';
-
+import './adminPage.css';
 
 class AdminPage extends React.Component {
 
@@ -346,6 +346,7 @@ class AdminPage extends React.Component {
 			 			<MenuItem>No User Selected</MenuItem>
 			 			</DropdownButton>
 			    }
+
 		    </div>
 						<div className="user-manager">
 							<div className="status-filter">
@@ -385,7 +386,7 @@ class AdminPage extends React.Component {
 										selected.map(user => {
 											var selected = false;
 											if (user.id === this.state.selectedUser.id) {
-												selected = true
+												selected = true;
 											}
 											return (<AdminTableRow user={user} selected={selected} 
 																key={user.id} selectUser={this.selectUser.bind(this, user)}/>)

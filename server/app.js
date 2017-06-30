@@ -9,10 +9,8 @@ import handleLogin	 	from './utils/handleLogin';
 import getActions			from './utils/getActions';
 import postActions 		from './utils/postActions';
 
+const port = process.env.PORT || 8000;
 
-//import middlewareActiveSession from './utils/middlewareActiveSession';
-
-const port = process.env.POST || 8000;
 
 const app = express();
 app.set('host', process.env.HOST || '127.0.0.1');

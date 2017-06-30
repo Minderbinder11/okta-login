@@ -1,6 +1,6 @@
 import request 			from 'request';
 import postActions 	from './postActions';
-import config 			from '../../config.json';
+import config 			from '../config.json';
 
 const oktaUrl = config.oktaUrl;
 const apiKey = config.API_KEY;
@@ -74,6 +74,7 @@ module.exports.getUsers = (req, res) => {
 	  	res.status(500).send(error);
 	  } else {
 	  	body = JSON.parse(body);
+      console.log('all users: ', body);
 	  	res.status(200).json({users: body});
 	  }
 	});

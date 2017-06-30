@@ -4,7 +4,8 @@ import React from 'react';
 import axios from 'axios';
 import { Redirect } from 'react-router';
 import HomePage from './homePage.jsx';
-
+import './loginPage.css';
+import myImage from './img/escow.jpg';
 
 class LoginPage extends React.Component {
 
@@ -140,7 +141,7 @@ class LoginPage extends React.Component {
       			</a>
     			</div>
 	    	</nav>
-
+				<div className="tester"></div>
 
 				{this.state.showLoginError && <div className="alert alert-danger login-message" role="alert"> 
 					Incorrect Username and Password.
@@ -157,6 +158,7 @@ class LoginPage extends React.Component {
 				{this.state.passwordResetSuccess && <div className="alert alert-danger login-message successfully-saved" role="alert"> 
 					A Password Reset Email Has Been Sent
 				</div>}
+				<img src={myImage} />
 	    	<div className="login-pane">
 	      <div className="card card-container">
 	        <img id="profile-img" className="profile-img-card" src="//ssl.gstatic.com/accounts/ui/avatar_2x.png" />
